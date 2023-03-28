@@ -1,0 +1,24 @@
+.userviewerpoliplugin h1,
+.userviewerpoliplugin h2,
+.userviewerpoliplugin h2,
+.userviewerpoliplugin h3,
+.userviewerpoliplugin h4,
+.userviewerpoliplugin h5 {
+    padding: 0px 0px 8px 0px !important;
+    margin: 0px 0px 0px 0px !important;
+}
+
+.userviewerpoliplugin p {
+    padding: 0 !important;
+    margin: 8px 0px 0px 0px !important;
+}
+
+.userviewerpoliplugin label {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.userviewerpoliplugin hr {
+    padding: 0 !important;
+    margin: 10px 0px 10px 0px !important;
+}

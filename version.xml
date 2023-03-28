@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE version SYSTEM "../../../lib/pkp/dtd/pluginVersion.dtd">
+
+
+<!--
+    * Plugin visualización de usuarios
+    * Dylan Mateo Llano Jaramillo & Juan José Restrepo Correa
+    * Politécnico Colombiano Jaime Isaza Cadavid
+    * Medellín-Colombia Marzo de 2022
+-->
+
+
+
+
+<version>
+<application>userViewerPoliPlugin</application>
+<type>plugins.generic</type>
+<release>1.0.0.0</release>
+<date>2023-03-13</date>
+<lazy-load>1</lazy-load>
+<class>UserViewerPoliPlugin</class>
+</version>

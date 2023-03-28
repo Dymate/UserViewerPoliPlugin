@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
+
+
+
+  
+<locale name="es_ES" full_name="Español (España)">
+	<message key="plugins.generic.userViewerPoliPlugin.displayName">Módulo de gestión de usuarios PJIC</message>
+	<message key="plugins.generic.userViewerPoliPlugin.description">Permite la busqueda, filtrado y generación de informes de usuarios de la revista.</message>
+
+  <message key="plugins.generic.userViewerPoliPlugin.managementMenuName">Usuarios</message>
+</locale>
