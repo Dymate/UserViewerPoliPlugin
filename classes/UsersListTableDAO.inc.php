@@ -54,7 +54,6 @@ class UsersListTableDAO extends DAO
             ,array((($page - 1) * 10))
         );
         
-        
         $returner = [];
         foreach ($result as $data) {
            $returner[] = $this->_fromRow($data);
@@ -62,6 +61,16 @@ class UsersListTableDAO extends DAO
         #$result->Close();
         return $returner;
     }
-
+    
+    public function searchUsers($sql){
+        $result = $this->retrieveRange($sql);
+        $returner = [];
+        foreach ($result as $data) {
+           
+           $returner[] = $this->_fromRow($data);
+        }
+        #$result->Close();
+        return $returner;
+    }
     
 }
