@@ -36,21 +36,21 @@ class UsersListTableDAO extends DAO
         return $usersListTable;
     }
 
-    public function getAllUsers($page = 1)
+    public function getAllUsers($page)
     {
         $result = $this->retrieveRange(
-            'SELECT u.user_id, 
+                'SELECT u.user_id, 
                 MAX(CASE WHEN us.setting_name = "givenName" THEN us.setting_value END) AS firstName,
                 MAX(CASE WHEN us.setting_name = "familyName" THEN us.setting_value END) AS lastName,
                 u.username,
                 u.email,
                 u.country,
-                GROUP_CONCAT(DISTINCT r.role_id SEPARATOR ",") AS roles
+                GROUP_CONCAT(DISTINCT uug.user_group_id SEPARATOR ",") AS roles
                 FROM users u 
                 LEFT JOIN user_settings us ON u.user_id = us.user_id
-                LEFT JOIN roles r ON u.user_id = r.user_id
+                LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
                 GROUP BY u.user_id
-                LIMIT 0, 10;'
+                limit ?,10;'
             ,array((($page - 1) * 10))
         );
         
@@ -71,6 +71,16 @@ class UsersListTableDAO extends DAO
         }
         #$result->Close();
         return $returner;
+    }
+    public function countUsers(){
+        $result = $this->retrieveRange(
+        'SELECT count( u.user_id) as users
+         FROM users u '
+        );
+        #Se convierte lazyCollection en array, se obtiene el stdObject de la posición 1 y se le extrae el valor y se convierte en entero
+        
+        $totalUsers=intval(iterator_to_array($result)[0]->users);
+        return $totalUsers;
     }
     
 }

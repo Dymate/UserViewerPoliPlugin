@@ -1,5 +1,7 @@
 <?php
 
+use PhpOption\None;
+
 import("classes.handler.Handler");
 
 
@@ -7,20 +9,19 @@ class UsersListTableHandler extends Handler
 {
 
     public function index($args, $request)
-    {       
+    {
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_COMMON, LOCALE_COMPONENT_APP_COMMON, LOCALE_COMPONENT_PKP_USER);
         $roles = $this->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
         if (count(array_intersect(array(ROLE_ID_SITE_ADMIN, ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR), $roles)) == 0) {
             header('HTTP/1.0 403 Forbidden');
             return print('<h2>Acceso denegado</h2>No tienes permitido ingresar a esta sección.');
         }
-
+ 
         $plugin = PluginRegistry::getPlugin("generic", "userviewerpoliplugin");
         $templateMgr = TemplateManager::getManager($request);
         $templateMgr->assign("userRoles", $roles); //Necesario para el botón usuarios
-        
-
-        $data = $this->getAllUsers();
+        $currentPage = isset($_GET["page"]) ? $_GET["page"] : 1;
+        $data = $this->getAllUsers($currentPage);
         $templateMgr->assign("usersTable", $this->listUsers($data));
         
         $name = isset($_POST['name']) ? $_POST['name'] : null;
@@ -29,14 +30,15 @@ class UsersListTableHandler extends Handler
         $email = isset($_POST['email']) ? $_POST['email'] : null;
         $country = isset($_POST['country']) ? $_POST['country'] : null;
         $userRoles = isset($_POST['roles']) ? $_POST['roles'] : null;
-        error_log($name);
-        #$currentPage = isset($_GET["page"]) ? $_GET["page"] : 1;
-        #$totalPages = $this->getSearchTotalPages($search);
-        #$templateMgr->assign("paginationControl", $this->paginationControl($currentPage,$totalPages));
+        
         if (($name or $lastName or $username or $email or $country or $userRoles) != null) {
-            $data=$this->generateSearchFilter($name, $lastName, $username, $email, $country, $userRoles);
+            $data = $this->generateSearchFilter($name, $lastName, $username, $email, $country, $userRoles);
             $templateMgr->assign("usersTable", $this->listUsers($data));
         }
+        
+        $totalPages = $this->getTotalPages();
+        $templateMgr->assign("paginationControl", $this->paginationControl($currentPage, $totalPages));
+        
         return $templateMgr->display($plugin->getTemplateResource("usersListTable.tpl"));
     }
 
@@ -61,31 +63,30 @@ class UsersListTableHandler extends Handler
         if ($name) {
             $sql .= "AND search.firstName LIKE '%$name%'";
         }
-        if ($lastName){
+        if ($lastName) {
             $sql .= "AND search.lastName LIKE '%$lastName%'";
         }
-        if ($username){
+        if ($username) {
             $sql .= "AND search.username LIKE '%$username%'";
         }
-        if ($email){
+        if ($email) {
             $sql .= "AND search.email LIKE '%$email%'";
         }
-        if ($country){
+        if ($country) {
             $sql .= "AND search.country LIKE '%$country%'";
         }
-        if ($userRoles){
+        if ($userRoles) {
             $sql .= "AND search.roles LIKE '%$userRoles%'";
         }
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
-        $result=$usersListTableDAO->searchUsers($sql);
-        
+        $result = $usersListTableDAO->searchUsers($sql);
+
         return $result;
-        
     }
-    public function getAllUsers()
+    public function getAllUsers($currentPage)
     {
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
-        $result = $usersListTableDAO->getAllUsers();
+        $result = $usersListTableDAO->getAllUsers($currentPage);
 
         return $result;
     }
@@ -115,7 +116,7 @@ class UsersListTableHandler extends Handler
         return $table;
     }
 
-    /*public function paginationControl($currentPage, $totalPages)
+    public function paginationControl($currentPage, $totalPages)
     {
         $paginationControl = '<ul class="pagination">';
 
@@ -127,7 +128,7 @@ class UsersListTableHandler extends Handler
         for ($i = ($currentPage - 5); $i <= $totalPages; $i++) {
             if ($i > 0 && ($i < ($currentPage + 10))) {
                 if ($currentPage == $i) {
-                    $paginationControl .= '<li class="active"><a href="#">' . ($i) . '<span class="sr-only">(current)</span></a></li>';
+                    $paginationControl .= '<li class="active"><a href="">' . ($i) . '<span class="sr-only">(current)</span></a></li>';
                 } else {
                     $paginationControl .= '<li><a href="?page=' . ($i) . '">' . ($i) . "</a></li>";
                 }
@@ -136,7 +137,7 @@ class UsersListTableHandler extends Handler
 
         if ($currentPage < $totalPages) {
             $paginationControl .= '<li><a href="?page=' . ($currentPage + 1) . '" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>';
-            $paginationControl .= '<li><a href="?page=' . serialize($totalPages) . '" aria-label="Next"><span aria-hidden="true">&raquo;&raquo;</span></a>';
+            $paginationControl .= '<li><a href="?page=' . $totalPages . '" aria-label="Next"><span aria-hidden="true">&raquo;&raquo;</span></a>';
         }
 
         $paginationControl .= "</ul>";
@@ -144,18 +145,15 @@ class UsersListTableHandler extends Handler
         return $paginationControl;
     }
 
-    public function getSearchTotalPages()
+    public function getTotalPages()
     {
         //$search = isset($_POST["search"]) ? $_POST["search"] : '';
 
-        $summaryHeaderDAO = DAORegistry::getDAO("SummaryHeaderDAO");
-        $totalPages = $summaryHeaderDAO->getBySearchTotalPages($search);
-
-        //error_log($totalPages);
-
+        $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
+        $totalPages = ceil(($usersListTableDAO->countUsers()) / 10);
         return $totalPages;
     }
-*/
+
     public function translateRolesIdToText($roles)
     {
         $arrayRoles = explode(",", $roles);
@@ -165,27 +163,59 @@ class UsersListTableHandler extends Handler
                 case "1":
                     $convertedRoles .= "Administrador del sitio,";
                     break;
+                case "2":
+                    $convertedRoles .= "Gestor,";
+                    break;
+                case "3":
+                    $convertedRoles .= "Editor,";
+                    break;
+                case "4":
+                    $convertedRoles .= "Coordinador,";
+                    break;
+                case "5":
+                    $convertedRoles .= "Editor de seccion,";
+                    break;
+                case "6":
+                    $convertedRoles .= "Editor invitado,";
+                    break;
+                case "7":
+                    $convertedRoles .= "Corrector de estilo,";
+                    break;
+                case "8":
+                    $convertedRoles .= "Diseñador/a,";
+                    break;
+                case "9":
+                    $convertedRoles .= "Coordinador/a de financiación,";
+                    break;
+                case "10":
+                    $convertedRoles .= "Documentalista,";
+                    break;
+                case "11":
+                    $convertedRoles .= "Maquetador/a,";
+                    break;
+                case "12":
+                    $convertedRoles .= "Coordinador/a de marketing y ventas,";
+                    break;
+                case "13":
+                    $convertedRoles .= "Corrector/a de pruebas,";
+                    break;
+                case "14":
+                    $convertedRoles .= "Autor/a,";
+                    break;
+                case "15":
+                    $convertedRoles .= "Traductor/a,";
+                    break;
                 case "16":
-                    $convertedRoles .= "Director,";
+                    $convertedRoles .= "Revisor/a externo,";
                     break;
                 case "17":
-                    $convertedRoles .= "Sub editor,";
+                    $convertedRoles .= "Lector/a,";
                     break;
-                case "4096":
-                    $convertedRoles .= "Evaluador,";
+                case "18":
+                    $convertedRoles .= "Gestor/a de suscripción,";
                     break;
-                case "4097":
-                    $convertedRoles .= "Asistente,";
-                    break;
-                case "65536":
-                    $convertedRoles .= "Autor,";
-                    break;
-                case "1048576":
-                    $convertedRoles .= "Lector,";
-                    break;
-                case "2097152":
-                    $convertedRoles .= "Gestor de suscripciones,";
-                    break;
+                default:
+                    $convertedRoles .= "Sin rol,";
             }
         }
         $lastOccurrence = strrpos($convertedRoles, ',');

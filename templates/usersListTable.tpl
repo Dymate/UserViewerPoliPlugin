@@ -20,27 +20,33 @@
                         <form class="form-control" method="POST">
                             <th>
                                 Nombre
-                                <input type="text" id="name" name="name" onchange="this.form.submit();" value="{$smarty.post.name}">
+                                <input type="text" id="name" name="name" onchange="this.form.submit();"
+                                    value="{$smarty.post.name}">
                             </th>
                             <th>
                                 Apellido
-                                <input type="text" id="lastname" name="lastname" onchange="this.form.submit();" value="{$smarty.post.lastname}">
+                                <input type="text" id="lastname" name="lastname" onchange="this.form.submit();"
+                                    value="{$smarty.post.lastname}">
                             </th>
                             <th>
                                 Nombre Usuario
-                                <input type="text" id="username" name="username" onchange="this.form.submit();" value="{$smarty.post.username}">
+                                <input type="text" id="username" name="username" onchange="this.form.submit();"
+                                    value="{$smarty.post.username}">
                             </th>
                             <th>
                                 Email
-                                 <input type="text" id="email" name="email" onchange="this.form.submit();" value="{$smarty.post.email}">
+                                <input type="text" id="email" name="email" onchange="this.form.submit();"
+                                    value="{$smarty.post.email}">
                             </th>
                             <th>
                                 País
-                                <input type="text" id="country" name="country" onchange="this.form.submit();" value="{$smarty.post.country}">
+                                <input type="text" id="country" name="country" onchange="this.form.submit();"
+                                    value="{$smarty.post.country}">
                             </th>
                             <th>
                                 Roles
-                                <input type="text" id="roles" name="roles" onchange="this.form.submit();" value="{$smarty.post.roles}">
+                                <input type="text" id="roles" name="roles" onchange="this.form.submit();"
+                                    value="{$smarty.post.roles}">
                             </th>
                         </form>
                         <th>
@@ -58,7 +64,6 @@
             <div class="alert alert-warning" role="alert">¡No se encontraron usuarios.</div>
         {/if}
     </div>
-</div>
 </div>
 
 {include file="frontend/components/footer.tpl"}
