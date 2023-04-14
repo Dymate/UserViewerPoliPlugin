@@ -16,29 +16,80 @@ class UsersListTableHandler extends Handler
             header('HTTP/1.0 403 Forbidden');
             return print('<h2>Acceso denegado</h2>No tienes permitido ingresar a esta sección.');
         }
- 
+
         $plugin = PluginRegistry::getPlugin("generic", "userviewerpoliplugin");
         $templateMgr = TemplateManager::getManager($request);
         $templateMgr->assign("userRoles", $roles); //Necesario para el botón usuarios
         $currentPage = isset($_GET["page"]) ? $_GET["page"] : 1;
         $data = $this->getAllUsers($currentPage);
         $templateMgr->assign("usersTable", $this->listUsers($data));
-        
+
+        $optionsCountry = array(
+            '' => 'Todos',
+            'CO' => 'Colombia',
+            'VE' => 'Venezuela',
+            'EC' => 'Ecuador',
+            'PE' => 'Perú',
+            'BR' => 'Brazil',
+            'BO' => 'Bolivia',
+            'PY' => 'Paraguay',
+            'CL' => 'Chile',
+            'UR' => 'Uruguay',
+            'AR' => 'Argentina',
+            'MX' => 'México',
+            'CR' => 'Costa Rica',
+            'RD' => 'Republica Dominicana',
+            'PA' => 'Panamá',
+            'US' => 'Estados Unidos',
+            'ES' => 'España',
+            'CA' => 'Canadá',
+            'IT'=>'Italia',
+            'CU'=>'Cuba',
+            'AF'=>'Afganistan',
+            'HA'=>'Honduras'
+        );
+        $optionsRoles = array(
+            '' => 'Todos',
+            '1' => 'admin del sitio',
+            '2' => 'Gestor/a de revista',
+            '3' => 'Editor/a de la revista',
+            '4' => 'Coordinador/a de producción',
+            '5' => 'Editor/a de sección',
+            '6' => 'Editor/a invitado/a',
+            '7' => 'Corrector/a de estilo',
+            '8' => 'Diseñador/a',
+            '9' => 'Coordinador/a de financiación',
+            '10' => 'Documentalista',
+            '11' => 'Maquetador/a',
+            '12' => 'Coordinador/a de marketing y ventas',
+            '13' => 'Corrector/a de pruebas',
+            '14' => 'Autor/a',
+            '15' => 'Traductor/a',
+            '16' => 'Revisor/a externo',
+            '17' => 'Lector/a',
+            '18' => 'Gestor/a de suscripción'
+        );
+        $selectedCountryValue = "";
+        $selectedRolesValue = "";
+        $templateMgr->assign("optionsCountry", $optionsCountry);
+        $templateMgr->assign("optionsRoles", $optionsRoles);
         $name = isset($_POST['name']) ? $_POST['name'] : null;
         $lastName = isset($_POST['lastname']) ? $_POST['lastname'] : null;
         $username = isset($_POST['username']) ? $_POST['username'] : null;
         $email = isset($_POST['email']) ? $_POST['email'] : null;
         $country = isset($_POST['country']) ? $_POST['country'] : null;
+        $templateMgr->assign("selectedCountryValue", $country);
         $userRoles = isset($_POST['roles']) ? $_POST['roles'] : null;
-        
+        $templateMgr->assign("selectedRolesValue", $userRoles);
+
         if (($name or $lastName or $username or $email or $country or $userRoles) != null) {
             $data = $this->generateSearchFilter($name, $lastName, $username, $email, $country, $userRoles);
             $templateMgr->assign("usersTable", $this->listUsers($data));
         }
-        
+
         $totalPages = $this->getTotalPages();
         $templateMgr->assign("paginationControl", $this->paginationControl($currentPage, $totalPages));
-        
+
         return $templateMgr->display($plugin->getTemplateResource("usersListTable.tpl"));
     }
 
@@ -53,10 +104,10 @@ class UsersListTableHandler extends Handler
                    u.username,
                    u.email,
                    u.country,
-                   GROUP_CONCAT(DISTINCT r.role_id SEPARATOR ',') AS roles
+                   GROUP_CONCAT(DISTINCT uug.user_group_id SEPARATOR ',') AS roles
             FROM users u 
             LEFT JOIN user_settings us ON u.user_id = us.user_id
-            LEFT JOIN roles r ON u.user_id = r.user_id
+            LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
             GROUP BY u.user_id) search
         WHERE 1=1 ";
 
@@ -76,8 +127,13 @@ class UsersListTableHandler extends Handler
             $sql .= "AND search.country LIKE '%$country%'";
         }
         if ($userRoles) {
-            $sql .= "AND search.roles LIKE '%$userRoles%'";
+            if ($userRoles == 1) {
+                $sql .= "AND search.roles LIKE '%1,%'";
+            } else {
+                $sql .= "AND search.roles LIKE '%$userRoles%'";
+            }
         }
+
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
         $result = $usersListTableDAO->searchUsers($sql);
 
@@ -100,15 +156,13 @@ class UsersListTableHandler extends Handler
                   <input type="checkbox" name="Select" value="1"></td>
                   <td>' . $row->getFirstName() . '</td>
                   <td>' . $row->getLastName() . '</td>
-                  <td>' . $row->getUserName() . '</td>
-                  <td>' . $row->getEmail() . '</td>
                   <td>' . $row->getCountry() . '</td>
                   <td>' . $this->translateRolesIdToText($row->getRoles()) . '</td>
                   
 
                   <td>
                       <a title="Mas detalles" href="./userspoliplugin-view?id=' . $row->getUserId() . '">
-                          <i class="glyphicon glyphicon-plus"></i>
+                          <i class="glyphicon glyphicon-eye-open"></i>
                       </a>&nbsp;
                   </td>
                 </tr>';

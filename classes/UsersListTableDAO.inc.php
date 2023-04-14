@@ -27,8 +27,6 @@ class UsersListTableDAO extends DAO
         $usersListTable ->setUserId($row->user_id);
         $usersListTable->setFirstName($row->firstName);
         $usersListTable->setLastName($row->lastName);
-        $usersListTable->setUserName($row->username);
-        $usersListTable->setEmail($row->email);
         $usersListTable->setCountry($row->country);
         $usersListTable->setRoles($row->roles);
         

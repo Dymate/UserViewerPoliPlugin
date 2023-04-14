@@ -15,7 +15,7 @@
                     <thead>
 
                         <th>
-                            Seleccionar
+
                         </th>
                         <form class="form-control" method="POST">
                             <th>
@@ -29,24 +29,28 @@
                                     value="{$smarty.post.lastname}">
                             </th>
                             <th>
-                                Nombre Usuario
-                                <input type="text" id="username" name="username" onchange="this.form.submit();"
-                                    value="{$smarty.post.username}">
-                            </th>
-                            <th>
-                                Email
-                                <input type="text" id="email" name="email" onchange="this.form.submit();"
-                                    value="{$smarty.post.email}">
-                            </th>
-                            <th>
                                 País
-                                <input type="text" id="country" name="country" onchange="this.form.submit();"
-                                    value="{$smarty.post.country}">
+                                <select name="country" onchange="this.form.submit()">
+                                {foreach $optionsCountry as $value => $label}
+                                    {if $value == $selectedCountryValue}
+                                        <option value="{$value}" selected>{$label}</option>
+                                    {else}
+                                        <option value="{$value}">{$label}</option>
+                                    {/if}
+                                {/foreach}
+                            </select>
                             </th>
                             <th>
                                 Roles
-                                <input type="text" id="roles" name="roles" onchange="this.form.submit();"
-                                    value="{$smarty.post.roles}">
+                                <select name="roles" onchange="this.form.submit()">
+                                {foreach $optionsRoles as $value => $label}
+                                    {if $value == $selectedRolesValue}
+                                        <option value="{$value}" selected>{$label}</option>
+                                    {else}
+                                        <option value="{$value}">{$label}</option>
+                                    {/if}
+                                {/foreach}
+                            </select>
                             </th>
                         </form>
                         <th>
@@ -61,7 +65,8 @@
             </div>
             <nav aria-label="Page navigation">{$paginationControl}</nav>
         {else}
-            <div class="alert alert-warning" role="alert">¡No se encontraron usuarios.</div>
+            <div class="alert alert-warning" role="alert">¡No se encontraron usuarios! <a href="./userviewerpoliplugin-list">Click aquí para volver</a></div>
+            
         {/if}
     </div>
 </div>
