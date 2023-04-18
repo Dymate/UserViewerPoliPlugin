@@ -12,7 +12,7 @@ class UsersListTableHandler extends Handler
     {
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_COMMON, LOCALE_COMPONENT_APP_COMMON, LOCALE_COMPONENT_PKP_USER);
         $roles = $this->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
-        if (count(array_intersect(array(ROLE_ID_SITE_ADMIN, ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR), $roles)) == 0) {
+        if (count(array_intersect(array(ROLE_ID_SITE_ADMIN), $roles)) == 0) {
             header('HTTP/1.0 403 Forbidden');
             return print('<h2>Acceso denegado</h2>No tienes permitido ingresar a esta sección.');
         }
@@ -43,10 +43,10 @@ class UsersListTableHandler extends Handler
             'US' => 'Estados Unidos',
             'ES' => 'España',
             'CA' => 'Canadá',
-            'IT'=>'Italia',
-            'CU'=>'Cuba',
-            'AF'=>'Afganistan',
-            'HA'=>'Honduras'
+            'IT' => 'Italia',
+            'CU' => 'Cuba',
+            'AF' => 'Afganistan',
+            'HA' => 'Honduras'
         );
         $optionsRoles = array(
             '' => 'Todos',
@@ -161,15 +161,70 @@ class UsersListTableHandler extends Handler
                   
 
                   <td>
-                      <a title="Mas detalles" href="./userspoliplugin-view?id=' . $row->getUserId() . '">
-                          <i class="glyphicon glyphicon-eye-open"></i>
-                      </a>&nbsp;
+                      <button class="btn btn-warning"type="button" data-toggle="modal" data-target="#myModal' . $row->getUserId(). '">
+                          <i class="glyphicon glyphicon-eye-open" style="color: black"></i>
+                      </button>&nbsp;
                   </td>
                 </tr>';
+            $table=$this->generateModalWindow($row,$table);    
         }
         return $table;
     }
-
+    public function generateModalWindow($user,$table){
+        $table.='
+        <div class="modal fade" id="myModal'.$user->getUserId().'">
+            <div class="modal-dialog modal-lg">
+            <div class="modal-content ">
+              <!-- Encabezado de la ventana modal -->
+                <div class="modal-header" style="height:70px">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-6"><div class="h1" style="">Información del usuario</div></div>
+                        
+                        <div class="col-sm-3"><button type="button" class="close" data-dismiss="modal">&times;</button></div>
+                    </div>
+                </div>
+            </div>
+      <!-- Cuerpo de la ventana modal -->
+      <div class="modal-body">
+        <div class="container">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="h3">'. $user->getFirstName().' '.$user->getLastName() . '</div>
+            </div>
+            <div class="col-sm-6">
+                <div><b>Usuario: </b>'. $user->getUserName() . '</div>
+                <div><b>Email: </b>'. $user->getEmail() . '</div>
+                <div><b>Nacionalidad: </b>'. $user->getCountry(). '</div>
+                <div><b>Roles: </b>'. $this->translateRolesIdToText($user->getRoles()). '</div>
+                <div><b>Universidad: </b> Politecnico JIC  <a href="" style="padding-left: 10px;"><i class="glyphicon glyphicon-pencil"></i></a></div>
+                <div><b>Grado universitario: </b> Ing Informatico  <a href="" style="padding-left: 10px;"><i class="glyphicon glyphicon-pencil"></i></a></div>
+                <div><b>Roles: </b>'. $this->translateRolesIdToText($user->getRoles()). '</div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="h3 text-muted">Biografía</div>
+        </div>
+        <div class="col-sm-6">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat odit iste maiores nobis officiis perferendis, blanditiis eligendi, hic est vitae error molestiae consectetur dignissimos ratione voluptatibus vel sint eveniet quos.</div>
+    </div> ';
+      
+        if (strpos($user->getRoles(),"2") !== false or strpos($user->getRoles(),"3") !== false){
+            
+        }
+        if (strpos($user->getRoles(),"14") !== false){
+          
+        }
+        $table.='
+                  </div>
+                </div>
+            </div>
+        </div>';
+        
+        return $table;
+    }
     public function paginationControl($currentPage, $totalPages)
     {
         $paginationControl = '<ul class="pagination">';
