@@ -51,10 +51,10 @@ class UserViewerPoliPlugin extends GenericPlugin
             $templateMgr = TemplateManager::getManager();
             $templateMgr->addStyleSheet('bootstrapStyle', '//cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css');
             $templateMgr->addJavaScript('bootstrapScript', '//cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js');
-
+            $templateMgr->addJavaScript('JqueryScript','//ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js');
+            $templateMgr->addJavaScript('PopperScript','//cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js');
             $templateMgr->addStyleSheet('sweetalert2Style', '//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css');
             $templateMgr->addJavaScript('sweetalert2Script', '//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js');
-
             $templateMgr->addStyleSheet('select2Style', '//select2.github.io/select2/select2-3.4.1/select2.css');
             $templateMgr->addStyleSheet('select2BootstrapStyle', '//fk.github.io/select2-bootstrap-css/css/select2-bootstrap.css');
             $templateMgr->addJavaScript('select2Script', '//select2.github.io/select2/select2-3.4.1/select2.js');

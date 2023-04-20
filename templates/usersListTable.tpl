@@ -6,9 +6,10 @@
     }
 </style>
 
+
 <div class="panel panel-default" style="width: fit-content; margin-right: 100px !important;">
     <div class="panel-heading">Usuarios en la base de datos</div>
-    <div class="panel-body">
+    <div class="panel-body">    
         {if $usersTable}
             <div class="table-responsive">
                 <table class="table">
@@ -31,26 +32,26 @@
                             <th>
                                 País
                                 <select name="country" onchange="this.form.submit()">
-                                {foreach $optionsCountry as $value => $label}
-                                    {if $value == $selectedCountryValue}
-                                        <option value="{$value}" selected>{$label}</option>
-                                    {else}
-                                        <option value="{$value}">{$label}</option>
-                                    {/if}
-                                {/foreach}
-                            </select>
+                                    {foreach $optionsCountry as $value => $label}
+                                        {if $value == $selectedCountryValue}
+                                            <option value="{$value}" selected>{$label}</option>
+                                        {else}
+                                            <option value="{$value}">{$label}</option>
+                                        {/if}
+                                    {/foreach}
+                                </select>
                             </th>
                             <th>
                                 Roles
                                 <select name="roles" onchange="this.form.submit()">
-                                {foreach $optionsRoles as $value => $label}
-                                    {if $value == $selectedRolesValue}
-                                        <option value="{$value}" selected>{$label}</option>
-                                    {else}
-                                        <option value="{$value}">{$label}</option>
-                                    {/if}
-                                {/foreach}
-                            </select>
+                                    {foreach $optionsRoles as $value => $label}
+                                        {if $value == $selectedRolesValue}
+                                            <option value="{$value}" selected>{$label}</option>
+                                        {else}
+                                            <option value="{$value}">{$label}</option>
+                                        {/if}
+                                    {/foreach}
+                                </select>
                             </th>
                         </form>
                         <th>
@@ -65,8 +66,9 @@
             </div>
             <nav aria-label="Page navigation">{$paginationControl}</nav>
         {else}
-            <div class="alert alert-warning" role="alert">¡No se encontraron usuarios! <a href="./userviewerpoliplugin-list">Click aquí para volver</a></div>
-            
+            <div class="alert alert-warning" role="alert">¡No se encontraron usuarios! <a
+                    href="./userviewerpoliplugin-list">Click aquí para volver</a></div>
+
         {/if}
     </div>
 </div>

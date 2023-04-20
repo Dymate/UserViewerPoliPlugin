@@ -77,6 +77,8 @@ class UsersListTableHandler extends Handler
         $lastName = isset($_POST['lastname']) ? $_POST['lastname'] : null;
         $username = isset($_POST['username']) ? $_POST['username'] : null;
         $email = isset($_POST['email']) ? $_POST['email'] : null;
+        $university=isset($_POST['university'])? $_POST['university']:null;
+        $user_id=isset($_POST['user_id'])? $_POST['user_id']:null;
         $country = isset($_POST['country']) ? $_POST['country'] : null;
         $templateMgr->assign("selectedCountryValue", $country);
         $userRoles = isset($_POST['roles']) ? $_POST['roles'] : null;
@@ -86,7 +88,12 @@ class UsersListTableHandler extends Handler
             $data = $this->generateSearchFilter($name, $lastName, $username, $email, $country, $userRoles);
             $templateMgr->assign("usersTable", $this->listUsers($data));
         }
+       if(($university and $user_id)!=null){
+           $this->updateUniversity($user_id,$university);
+           $url = $_SERVER['REQUEST_URI'];
+           header("Location: $url");
 
+        }
         $totalPages = $this->getTotalPages();
         $templateMgr->assign("paginationControl", $this->paginationControl($currentPage, $totalPages));
 
@@ -159,70 +166,106 @@ class UsersListTableHandler extends Handler
                   <td>' . $row->getCountry() . '</td>
                   <td>' . $this->translateRolesIdToText($row->getRoles()) . '</td>
                   
-
                   <td>
-                      <button class="btn btn-warning"type="button" data-toggle="modal" data-target="#myModal' . $row->getUserId(). '">
+                      <button class="btn btn-warning"type="button" data-toggle="modal" data-target="#myModal' . $row->getUserId() . '">
                           <i class="glyphicon glyphicon-eye-open" style="color: black"></i>
+                          
                       </button>&nbsp;
                   </td>
                 </tr>';
-            $table=$this->generateModalWindow($row,$table);    
+            $table = $this->generateModalWindow($row, $table);
         }
         return $table;
     }
-    public function generateModalWindow($user,$table){
-        $table.='
-        <div class="modal fade" id="myModal'.$user->getUserId().'">
-            <div class="modal-dialog modal-lg">
-            <div class="modal-content ">
-              <!-- Encabezado de la ventana modal -->
-                <div class="modal-header" style="height:70px">
+    public function generateModalWindow($user, $table)
+    {
+        $table .= '
+<div class="modal fade" id="myModal' . $user->getUserId() . '" aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+            <!-- Encabezado de la ventana modal -->
+            <div class="modal-header" style="height:70px">
                 <div class="container">
                     <div class="row">
-                        <div class="col-sm-6"><div class="h1" style="">Información del usuario</div></div>
-                        
-                        <div class="col-sm-3"><button type="button" class="close" data-dismiss="modal">&times;</button></div>
+                        <div class="col-sm-6">
+                            <div class="h1" style="">Información del usuario</div>
+                        </div>
+
+                        <div class="col-sm-3"><button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
                     </div>
                 </div>
             </div>
-      <!-- Cuerpo de la ventana modal -->
+            <!-- Cuerpo de la ventana modal -->
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="h4"> ID:' . $user->getUserId() . '</div>
+                            <div class="h3">' . $user->getFirstName() . ' ' . $user->getLastName() . '</div>
+                           
+                        </div>
+                        <div class="col-sm-6">
+                            <div><b>Usuario: </b>' . $user->getUserName() . '</div>
+                            <div><b>Email: </b>' . $user->getEmail() . '</div>
+                            <div><b>Nacionalidad: </b>' . $user->getCountry() . '</div>
+                            <div><b>Universidad: </b> ' . $user->getUniversity() . ' <button class="text-success" style="border:none; background:none" type="button" data-toggle="modal" data-target="#mySecondModal' . $user->getUserId() . '">
+                            <i class="text-success glyphicon glyphicon-pencil" ></i>
+                        </button>&nbsp;</div>
+                            <div><b>Grado universitario: </b> Ing Informatico  </div>
+                            <div><b>Roles: </b>' . $this->translateRolesIdToText($user->getRoles()) . '</div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="h3 text-muted">Biografía</div>
+                    </div>
+                    <div class="col-sm-6">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat odit iste
+                        maiores nobis officiis perferendis, blanditiis eligendi, hic est vitae error molestiae
+                        consectetur dignissimos ratione voluptatibus vel sint eveniet quos.</div>
+                </div>
+                <div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+  
+  </div>
+</div>
+       
+<div class="modal fade" id="mySecondModal' . $user->getUserId() . '" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="exampleModalToggleLabel2">Añadir universidad al usuario</h1>
+        
+      </div>
       <div class="modal-body">
-        <div class="container">
-        <div class="row">
-            <div class="col-sm-3">
-                <div class="h3">'. $user->getFirstName().' '.$user->getLastName() . '</div>
-            </div>
-            <div class="col-sm-6">
-                <div><b>Usuario: </b>'. $user->getUserName() . '</div>
-                <div><b>Email: </b>'. $user->getEmail() . '</div>
-                <div><b>Nacionalidad: </b>'. $user->getCountry(). '</div>
-                <div><b>Roles: </b>'. $this->translateRolesIdToText($user->getRoles()). '</div>
-                <div><b>Universidad: </b> Politecnico JIC  <a href="" style="padding-left: 10px;"><i class="glyphicon glyphicon-pencil"></i></a></div>
-                <div><b>Grado universitario: </b> Ing Informatico  <a href="" style="padding-left: 10px;"><i class="glyphicon glyphicon-pencil"></i></a></div>
-                <div><b>Roles: </b>'. $this->translateRolesIdToText($user->getRoles()). '</div>
-            </div>
-        </div>
-    </div>
-    <hr>
-    <div class="row">
-        <div class="col-sm-3">
-            <div class="h3 text-muted">Biografía</div>
-        </div>
-        <div class="col-sm-6">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat odit iste maiores nobis officiis perferendis, blanditiis eligendi, hic est vitae error molestiae consectetur dignissimos ratione voluptatibus vel sint eveniet quos.</div>
-    </div> ';
+      <form  method="POST">
       
-        if (strpos($user->getRoles(),"2") !== false or strpos($user->getRoles(),"3") !== false){
-            
+      <input type="hidden" name="user_id" value="'.$user->getUserId().'" style="display:none;">
+      <div><b>Universidad: </b><input type="text" name="university" value="' . $user->getUniversity() . '"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-success" type=submit>Actualizar</button>
+        <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+';
+
+        if (strpos($user->getRoles(), "2") !== false or strpos($user->getRoles(), "3") !== false) {
         }
-        if (strpos($user->getRoles(),"14") !== false){
-          
+        if (strpos($user->getRoles(), "14") !== false) {
         }
-        $table.='
+        $table .= '
                   </div>
                 </div>
             </div>
         </div>';
-        
+
         return $table;
     }
     public function paginationControl($currentPage, $totalPages)
@@ -332,5 +375,10 @@ class UsersListTableHandler extends Handler
             $convertedRoles = substr_replace($convertedRoles, '', $lastOccurrence, 1);
         }
         return $convertedRoles;
+    }
+
+    public function updateUniversity($user_id,$university){
+        $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
+        $rowsAffected=$usersListTableDAO->updateUniversity($user_id,$university);
     }
 }

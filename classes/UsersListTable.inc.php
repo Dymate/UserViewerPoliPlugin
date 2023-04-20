@@ -38,7 +38,14 @@ class UsersListTable extends DataObject
     {
         return $this->setData('username', $userName);
     }
-
+    /* Getter Setter universidad*/
+    public function getUniversity(){
+        return $this->getData('university');
+    }
+    public function setUniversity($university)
+    {
+        return $this->setData('university', $university);
+    }
     /* Getter Setter Correo*/
      public function getEmail(){
         return $this->getData('email');
