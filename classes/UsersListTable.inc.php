@@ -46,6 +46,22 @@ class UsersListTable extends DataObject
     {
         return $this->setData('university', $university);
     }
+    //getter Setter grado academico
+    public function getAcademicDegree(){
+        return $this->getData('academicDegree');
+    }
+    public function setAcademicDegree($academicDegree)
+    {
+        return $this->setData('academicDegree', $academicDegree);
+    }
+    //getter Setter biografía
+    public function getBiography(){
+        return $this->getData('biography');
+    }
+    public function setBiography($biography)
+    {
+        return $this->setData('biography', $biography);
+    }
     /* Getter Setter Correo*/
      public function getEmail(){
         return $this->getData('email');

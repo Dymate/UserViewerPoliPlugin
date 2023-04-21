@@ -28,6 +28,8 @@ class UsersListTableDAO extends DAO
         $usersListTable->setFirstName($row->firstName);
         $usersListTable->setLastName($row->lastName);
         $usersListTable->setUniversity($row->university);
+        $usersListTable->setAcademicDegree($row->academicDegree);
+        $usersListTable->setBiography($row->biography);
         $usersListTable->setUserName($row->username);
         $usersListTable->setEmail($row->email);
         $usersListTable->setCountry($row->country);
@@ -44,6 +46,8 @@ class UsersListTableDAO extends DAO
                 MAX(CASE WHEN us.setting_name = "givenName" THEN us.setting_value END) AS firstName,
                 MAX(CASE WHEN us.setting_name = "familyName" THEN us.setting_value END) AS lastName,
                 MAX(CASE WHEN us.setting_name= "affiliation" THEN us.setting_value END) as university,
+                MAX(CASE WHEN us.setting_name= "academicDegree" THEN us.setting_value END) as academicDegree,
+                MAX(CASE WHEN us.setting_name= "biography" THEN us.setting_value END) as biography,
                 u.username,
                 u.email,
                 u.country,
@@ -88,12 +92,47 @@ class UsersListTableDAO extends DAO
     }
     public function updateUniversity($userId, $newUniversity)
     {
-       $rowsAffected= $this->update(
+        $rowsAffected = $this->update(
             'Update user_settings 
             Set setting_value=?
             where user_id=? AND setting_name="affiliation"',
             array($newUniversity, $userId)
         );
         return $rowsAffected;
+    }
+    public function updateAcademicDegree($userId, $newAcademicDegree)
+    {
+        $rowsAffected = $this->update(
+            'Update user_settings 
+            Set setting_value=?
+            where user_id=? AND setting_name="academicDegree"',
+            array($newAcademicDegree, $userId)
+        );
+        return $rowsAffected;
+    }
+    public function insertAcademicDegree($userId, $newAcademicDegree)
+    {
+        $rowsAffected = $this->update(
+            "INSERT INTO user_settings (user_id,setting_name, setting_value,setting_type) VALUES (?, 'academicDegree', ?,'string');",
+            array($userId, $newAcademicDegree)
+        );
+        return $rowsAffected;
+    }
+    public function userHasAcademicDegree($user_id)
+    {
+        $result = $this->retrieveRange(
+            'Select count(*) as results
+            from user_settings 
+            where user_id=? and setting_name="academicDegree" ',array($user_id)
+        );
+        #Se convierte lazyCollection en array, se obtiene el stdObject de la posición 1 y se le extrae el valor y se convierte en entero
+
+        $resultCounted = intval(iterator_to_array($result)[0]->results);
+        if($resultCounted>0){
+            return true;
+        }else {
+            return false;
+        }
+        
     }
 }

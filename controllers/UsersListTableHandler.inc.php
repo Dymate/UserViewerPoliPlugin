@@ -79,6 +79,7 @@ class UsersListTableHandler extends Handler
         $email = isset($_POST['email']) ? $_POST['email'] : null;
         $university=isset($_POST['university'])? $_POST['university']:null;
         $user_id=isset($_POST['user_id'])? $_POST['user_id']:null;
+        $newAcademicDegree=isset($_POST['newAcademicDegree'])? $_POST['newAcademicDegree']:null;
         $country = isset($_POST['country']) ? $_POST['country'] : null;
         $templateMgr->assign("selectedCountryValue", $country);
         $userRoles = isset($_POST['roles']) ? $_POST['roles'] : null;
@@ -94,6 +95,11 @@ class UsersListTableHandler extends Handler
            header("Location: $url");
 
         }
+        if(($user_id and $newAcademicDegree)!=null){
+          $this->updateAcademicDegree($user_id,$newAcademicDegree);
+          $url = $_SERVER['REQUEST_URI'];
+          header("Location: $url");
+        }
         $totalPages = $this->getTotalPages();
         $templateMgr->assign("paginationControl", $this->paginationControl($currentPage, $totalPages));
 
@@ -103,11 +109,14 @@ class UsersListTableHandler extends Handler
     public function generateSearchFilter($name, $lastName, $username, $email, $country, $userRoles)
     {
 
-        $sql = "SELECT	search.user_id,search.firstName, search.lastName, search.username, search.email,search.country, search.roles
+        $sql = "SELECT	search.user_id,search.firstName, search.lastName, search.university, search.academicDegree,search.biography, search.username, search.email,search.country, search.roles
         FROM (  
             SELECT u.user_id,
                    MAX(CASE WHEN us.setting_name = 'givenName' THEN us.setting_value END) AS firstName,
                    MAX(CASE WHEN us.setting_name = 'familyName' THEN us.setting_value END) AS lastName,
+                   MAX(CASE WHEN us.setting_name= 'affiliation' THEN us.setting_value END) as university,
+                   MAX(CASE WHEN us.setting_name= 'academicDegree' THEN us.setting_value END) as academicDegree,
+                   MAX(CASE WHEN us.setting_name= 'biography' THEN us.setting_value END) as biography,
                    u.username,
                    u.email,
                    u.country,
@@ -212,7 +221,9 @@ class UsersListTableHandler extends Handler
                             <div><b>Universidad: </b> ' . $user->getUniversity() . ' <button class="text-success" style="border:none; background:none" type="button" data-toggle="modal" data-target="#mySecondModal' . $user->getUserId() . '">
                             <i class="text-success glyphicon glyphicon-pencil" ></i>
                         </button>&nbsp;</div>
-                            <div><b>Grado universitario: </b> Ing Informatico  </div>
+                            <div><b>Grado universitario: </b> '.$user->getAcademicDegree().'<button class="text-success" style="border:none; background:none" type="button" data-toggle="modal" data-target="#myThirdModal' . $user->getUserId() . '">
+                            <i class="text-success glyphicon glyphicon-pencil" ></i>
+                        </button>&nbsp; </div>
                             <div><b>Roles: </b>' . $this->translateRolesIdToText($user->getRoles()) . '</div>
                         </div>
                     </div>
@@ -222,9 +233,7 @@ class UsersListTableHandler extends Handler
                     <div class="col-sm-3">
                         <div class="h3 text-muted">Biografía</div>
                     </div>
-                    <div class="col-sm-6">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat odit iste
-                        maiores nobis officiis perferendis, blanditiis eligendi, hic est vitae error molestiae
-                        consectetur dignissimos ratione voluptatibus vel sint eveniet quos.</div>
+                    <div class="col-sm-6">'.$user->getBiography().'</div>
                 </div>
                 <div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
   
@@ -235,7 +244,7 @@ class UsersListTableHandler extends Handler
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title" id="exampleModalToggleLabel2">Añadir universidad al usuario</h1>
+        <h1 class="modal-title" id="exampleModalToggleLabel2">Actualizar universidad al usuario</h1>
         
       </div>
       <div class="modal-body">
@@ -243,6 +252,29 @@ class UsersListTableHandler extends Handler
       
       <input type="hidden" name="user_id" value="'.$user->getUserId().'" style="display:none;">
       <div><b>Universidad: </b><input type="text" name="university" value="' . $user->getUniversity() . '"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-success" type=submit>Actualizar</button>
+        <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="myThirdModal' . $user->getUserId() . '" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="exampleModalToggleLabel2">Actualizar grado academico al usuario</h1>
+        
+      </div>
+      <div class="modal-body">
+      <form  method="POST">
+      
+      <input type="hidden" name="user_id" value="'.$user->getUserId().'" style="display:none;">
+      <div><b>Grado academico: </b><input type="text" name="newAcademicDegree" value="' . $user->getAcademicDegree() . '"></div>
       </div>
 
       <div class="modal-footer">
@@ -380,5 +412,14 @@ class UsersListTableHandler extends Handler
     public function updateUniversity($user_id,$university){
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
         $rowsAffected=$usersListTableDAO->updateUniversity($user_id,$university);
+    }
+    public function updateAcademicDegree($user_id,$newAcademicDegree){
+        $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
+        if ($usersListTableDAO->userHasAcademicDegree($user_id)) {
+            $rowsAffected=$usersListTableDAO->updateAcademicDegree($user_id,$newAcademicDegree);
+        }else{
+            $rowsAffected=$usersListTableDAO->insertAcademicDegree($user_id,$newAcademicDegree);
+        }
+        
     }
 }
