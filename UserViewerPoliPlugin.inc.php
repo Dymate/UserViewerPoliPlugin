@@ -20,6 +20,9 @@ class UserViewerPoliPlugin extends GenericPlugin
             import('plugins.generic.userViewerPoliPlugin.classes.UsersListTableDAO');
             $usersListTableDAO = new UsersListTableDAO();
             DAORegistry::registerDAO('UsersListTableDAO', $usersListTableDAO);
+            import('plugins.generic.userViewerPoliPlugin.classes.ReviewerAssignmentsDAO');
+            $reviewerAssignmentsDAO= new ReviewerAssignmentsDAO();
+            DAORegistry::registerDAO('ReviewerAssignmentsDAO',$reviewerAssignmentsDAO);
 			
 			HookRegistry::register('Templates::Common::Footer::PageFooter', array($this, 'callbackShowUsersMenu'));
 

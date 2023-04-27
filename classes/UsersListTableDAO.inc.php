@@ -110,6 +110,16 @@ class UsersListTableDAO extends DAO
         );
         return $rowsAffected;
     }
+    public function updateBiography($userId, $biography)
+    {
+        $rowsAffected = $this->update(
+            'Update user_settings 
+            Set setting_value=?
+            where user_id=? AND setting_name="biography"',
+            array($biography, $userId)
+        );
+        return $rowsAffected;
+    }
     public function insertAcademicDegree($userId, $newAcademicDegree)
     {
         $rowsAffected = $this->update(

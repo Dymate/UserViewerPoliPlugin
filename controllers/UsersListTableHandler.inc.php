@@ -77,9 +77,10 @@ class UsersListTableHandler extends Handler
         $lastName = isset($_POST['lastname']) ? $_POST['lastname'] : null;
         $username = isset($_POST['username']) ? $_POST['username'] : null;
         $email = isset($_POST['email']) ? $_POST['email'] : null;
-        $university=isset($_POST['university'])? $_POST['university']:null;
-        $user_id=isset($_POST['user_id'])? $_POST['user_id']:null;
-        $newAcademicDegree=isset($_POST['newAcademicDegree'])? $_POST['newAcademicDegree']:null;
+        $university = isset($_POST['university']) ? $_POST['university'] : null;
+        $user_id = isset($_POST['user_id']) ? $_POST['user_id'] : null;
+        $newAcademicDegree = isset($_POST['newAcademicDegree']) ? $_POST['newAcademicDegree'] : null;
+        $biography = isset($_POST['biography']) ? $_POST['biography'] : null;
         $country = isset($_POST['country']) ? $_POST['country'] : null;
         $templateMgr->assign("selectedCountryValue", $country);
         $userRoles = isset($_POST['roles']) ? $_POST['roles'] : null;
@@ -89,16 +90,20 @@ class UsersListTableHandler extends Handler
             $data = $this->generateSearchFilter($name, $lastName, $username, $email, $country, $userRoles);
             $templateMgr->assign("usersTable", $this->listUsers($data));
         }
-       if(($university and $user_id)!=null){
-           $this->updateUniversity($user_id,$university);
-           $url = $_SERVER['REQUEST_URI'];
-           header("Location: $url");
-
+        if (($university and $user_id) != null) {
+            $this->updateUniversity($user_id, $university);
+            $url = $_SERVER['REQUEST_URI'];
+            header("Location: $url");
         }
-        if(($user_id and $newAcademicDegree)!=null){
-          $this->updateAcademicDegree($user_id,$newAcademicDegree);
-          $url = $_SERVER['REQUEST_URI'];
-          header("Location: $url");
+        if (($user_id and $newAcademicDegree) != null) {
+            $this->updateAcademicDegree($user_id, $newAcademicDegree);
+            $url = $_SERVER['REQUEST_URI'];
+            header("Location: $url");
+        }
+        if (($user_id and $biography) != null) {
+            $this->updateBiography($user_id, $biography);
+            $url = $_SERVER['REQUEST_URI'];
+            header("Location: $url");
         }
         $totalPages = $this->getTotalPages();
         $templateMgr->assign("paginationControl", $this->paginationControl($currentPage, $totalPages));
@@ -220,10 +225,10 @@ class UsersListTableHandler extends Handler
                             <div><b>Nacionalidad: </b>' . $user->getCountry() . '</div>
                             <div><b>Universidad: </b> ' . $user->getUniversity() . ' <button class="text-success" style="border:none; background:none" type="button" data-toggle="modal" data-target="#mySecondModal' . $user->getUserId() . '">
                             <i class="text-success glyphicon glyphicon-pencil" ></i>
-                        </button>&nbsp;</div>
-                            <div><b>Grado universitario: </b> '.$user->getAcademicDegree().'<button class="text-success" style="border:none; background:none" type="button" data-toggle="modal" data-target="#myThirdModal' . $user->getUserId() . '">
+                            </button>&nbsp;</div>
+                            <div><b>Grado universitario: </b> ' . $user->getAcademicDegree() . '<button class="text-success" style="border:none; background:none" type="button" data-toggle="modal" data-target="#myThirdModal' . $user->getUserId() . '">
                             <i class="text-success glyphicon glyphicon-pencil" ></i>
-                        </button>&nbsp; </div>
+                            </button>&nbsp; </div>
                             <div><b>Roles: </b>' . $this->translateRolesIdToText($user->getRoles()) . '</div>
                         </div>
                     </div>
@@ -231,15 +236,52 @@ class UsersListTableHandler extends Handler
                 <hr>
                 <div class="row">
                     <div class="col-sm-3">
-                        <div class="h3 text-muted">Biografía</div>
+                        <div class="h3 text-muted">Biografía <button class="text-success" style="border:none; background:none" type="button" data-toggle="modal" data-target="#myFourthModal' . $user->getUserId() . '">
+                        <i class="text-success glyphicon glyphicon-pencil" ></i>
+                    </button></div>
                     </div>
-                    <div class="col-sm-6">'.$user->getBiography().'</div>
+                    <div class="col-sm-6">' . $user->getBiography() . '</div>
+                </div>        
+';
+        if (strpos($user->getRoles(), "16") !== false) {
+          list(
+            $completedReviews,
+            $activeReviews,
+            $rejectedReviews,
+            $DaysSinceLastReview,
+            $DaysToCompleteReviews) =  $this->queryReviewAssignments($user->getUserId());
+
+            $table.='
+            <hr>
+            <div class="accordion" id="accordionReviewer'.$user->getUserId().'">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingReviewer'.$user->getUserId().'">
+                    <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseReviewer'.$user->getUserId().'" aria-expanded="false" aria-controls="collapseReviewer'.$user->getUserId().'">
+                    Actividad Como evaluador
+                    </button>
+                </h2>
+                <div id="collapseReviewer'.$user->getUserId().'" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                    <div class="accordion-body">
+                    <ul class="list-group">
+                    <li class="list-group-item">Revisiones completadas: '.$completedReviews.'</li>
+                    <li class="list-group-item">Revisiones activas:  '.$activeReviews.'</li>
+                    <li class="list-group-item">Revisiones Rechazadas: '.$rejectedReviews.'</li>
+                    <li class="list-group-item">Días desde la ultima revision: '.$DaysSinceLastReview.'</li>
+                    <li class="list-group-item">Promedio de días para completar una revisión: '.$DaysToCompleteReviews.'</li>
+                  </ul>
+                    </div>
                 </div>
-                <div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
-  
-  </div>
-</div>
-       
+                </div>
+          </div>';
+
+        }
+        if (strpos($user->getRoles(), "14") !== false) {
+        }
+
+        $table .= '
+        </div>
+        </div>
+    </div>  
 <div class="modal fade" id="mySecondModal' . $user->getUserId() . '" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -250,7 +292,7 @@ class UsersListTableHandler extends Handler
       <div class="modal-body">
       <form  method="POST">
       
-      <input type="hidden" name="user_id" value="'.$user->getUserId().'" style="display:none;">
+      <input type="hidden" name="user_id" value="' . $user->getUserId() . '" style="display:none;">
       <div><b>Universidad: </b><input type="text" name="university" value="' . $user->getUniversity() . '"></div>
       </div>
 
@@ -273,7 +315,7 @@ class UsersListTableHandler extends Handler
       <div class="modal-body">
       <form  method="POST">
       
-      <input type="hidden" name="user_id" value="'.$user->getUserId().'" style="display:none;">
+      <input type="hidden" name="user_id" value="' . $user->getUserId() . '" style="display:none;">
       <div><b>Grado academico: </b><input type="text" name="newAcademicDegree" value="' . $user->getAcademicDegree() . '"></div>
       </div>
 
@@ -286,17 +328,30 @@ class UsersListTableHandler extends Handler
     </div>
   </div>
 </div>
-';
+<div class="modal fade" id="myFourthModal' . $user->getUserId() . '" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="exampleModalToggleLabel2">Actualizar Biografía del usuario</h1>
+        
+      </div>
+      <div class="modal-body">
+      <form  method="POST">
+      
+      <input type="hidden" name="user_id" value="' . $user->getUserId() . '" style="display:none;">
+      <div><b>Biografía: </b><textarea type="text" style="width: 500px; height:80px;"  name="biography" value="' . $user->getBiography() . ' ">' . $user->getBiography() . '</textarea></div>
+      </div>
 
-        if (strpos($user->getRoles(), "2") !== false or strpos($user->getRoles(), "3") !== false) {
-        }
-        if (strpos($user->getRoles(), "14") !== false) {
-        }
-        $table .= '
-                  </div>
-                </div>
-            </div>
-        </div>';
+      <div class="modal-footer">
+        <button class="btn btn-success" type=submit>Actualizar</button>
+        <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+                  ';
 
         return $table;
     }
@@ -409,17 +464,32 @@ class UsersListTableHandler extends Handler
         return $convertedRoles;
     }
 
-    public function updateUniversity($user_id,$university){
+    public function updateUniversity($user_id, $university)
+    {
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
-        $rowsAffected=$usersListTableDAO->updateUniversity($user_id,$university);
+        $rowsAffected = $usersListTableDAO->updateUniversity($user_id, $university);
     }
-    public function updateAcademicDegree($user_id,$newAcademicDegree){
+    public function updateBiography($user_id, $biography)
+    {
+        $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
+        $rowsAffected = $usersListTableDAO->updateBiography($user_id, $biography);
+    }
+    public function updateAcademicDegree($user_id, $newAcademicDegree)
+    {
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
         if ($usersListTableDAO->userHasAcademicDegree($user_id)) {
-            $rowsAffected=$usersListTableDAO->updateAcademicDegree($user_id,$newAcademicDegree);
-        }else{
-            $rowsAffected=$usersListTableDAO->insertAcademicDegree($user_id,$newAcademicDegree);
+            $rowsAffected = $usersListTableDAO->updateAcademicDegree($user_id, $newAcademicDegree);
+        } else {
+            $rowsAffected = $usersListTableDAO->insertAcademicDegree($user_id, $newAcademicDegree);
         }
-        
+    }
+    public function queryReviewAssignments($user_id){
+        $reviewerAssignmentsDAO=DAORegistry::getDAO("ReviewerAssignmentsDAO");
+        $completedReviews=$reviewerAssignmentsDAO->countCompletedReviews($user_id);
+        $activeReviews=$reviewerAssignmentsDAO->countActiveReviews($user_id);
+        $rejectedReviews=$reviewerAssignmentsDAO->countRejectedReviews($user_id);
+        $DaysSinceLastReview=$reviewerAssignmentsDAO->countDaysSinceLastReview($user_id);
+        $DaysToCompleteReviews=$reviewerAssignmentsDAO->avgDaysToCompleteReviews($user_id);
+        return array($completedReviews,$activeReviews,$rejectedReviews,$DaysSinceLastReview,$DaysToCompleteReviews);
     }
 }
