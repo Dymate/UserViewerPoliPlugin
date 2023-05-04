@@ -85,10 +85,13 @@ class UsersListTableHandler extends Handler
         $templateMgr->assign("selectedCountryValue", $country);
         $userRoles = isset($_POST['roles']) ? $_POST['roles'] : null;
         $templateMgr->assign("selectedRolesValue", $userRoles);
-
+        //$selectedUsers=isset($_POST['selectedValues']) ? $_POST['selectedValues'] : null;
+       
+        
         if (($name or $lastName or $username or $email or $country or $userRoles) != null) {
             $data = $this->generateSearchFilter($name, $lastName, $username, $email, $country, $userRoles);
             $templateMgr->assign("usersTable", $this->listUsers($data));
+            
         }
         if (($university and $user_id) != null) {
             $this->updateUniversity($user_id, $university);
@@ -154,10 +157,9 @@ class UsersListTableHandler extends Handler
                 $sql .= "AND search.roles LIKE '%$userRoles%'";
             }
         }
-
+        
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
         $result = $usersListTableDAO->searchUsers($sql);
-
         return $result;
     }
     public function getAllUsers($currentPage)
@@ -173,8 +175,11 @@ class UsersListTableHandler extends Handler
         foreach ($data as $row) {
             $table .= '
                 <tr>
+                
                   <td>   
-                  <input type="checkbox" name="Select" value="1"></td>
+                    <input type="checkbox" name="exportUser[]" value="'.$row->getUserId().'" onclick="updateCheckboxValues(this.value)">
+                  </td>
+
                   <td>' . $row->getFirstName() . '</td>
                   <td>' . $row->getLastName() . '</td>
                   <td>' . $row->getCountry() . '</td>
@@ -276,6 +281,35 @@ class UsersListTableHandler extends Handler
 
         }
         if (strpos($user->getRoles(), "14") !== false) {
+            list($publicationsSended,
+            $queuedPublications,
+            $publicationsAcepted,
+            $publicationsRejected,
+            $scheduledPublications) =  $this->queryAuthorActivity($user->getEmail());
+    
+                $table.='
+                <hr>
+                <div class="accordion" id="accordionAuthor'.$user->getUserId().'">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingReviewer'.$user->getUserId().'">
+                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#collapseAuthor'.$user->getUserId().'" aria-expanded="false" aria-controls="collapseAuthor'.$user->getUserId().'">
+                        Actividad Como Autor
+                        </button>
+                    </h2>
+                    <div id="collapseAuthor'.$user->getUserId().'" class="accordion-collapse collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+                        <div class="accordion-body">
+                        <ul class="list-group">
+                        <li class="list-group-item">Articulos Enviados: '.$publicationsSended.'</li>
+                        <li class="list-group-item">Articulos en espera:  '.$queuedPublications.'</li>
+                        <li class="list-group-item">Articulos Aceptadas: '.$publicationsAcepted.'</li>
+                        <li class="list-group-item">Articulos rechazados: '.$publicationsRejected.'</li>
+                        <li class="list-group-item">Articulos programados: '.$scheduledPublications.'</li>
+                      </ul>
+                        </div>
+                    </div>
+                    </div>
+              </div>';
+    
         }
 
         $table .= '
@@ -491,5 +525,14 @@ class UsersListTableHandler extends Handler
         $DaysSinceLastReview=$reviewerAssignmentsDAO->countDaysSinceLastReview($user_id);
         $DaysToCompleteReviews=$reviewerAssignmentsDAO->avgDaysToCompleteReviews($user_id);
         return array($completedReviews,$activeReviews,$rejectedReviews,$DaysSinceLastReview,$DaysToCompleteReviews);
+    }
+    public function queryAuthorActivity($email){
+        $authorActivityDAO=DAORegistry::getDAO("AuthorActivityDAO");
+        $publicationsSended=$authorActivityDAO->publicationSended($email);
+        $queuedPublications=$authorActivityDAO->publicationQueued($email);
+        $publicationsAcepted=$authorActivityDAO->publicationAccepted($email);
+        $publicationsRejected=$authorActivityDAO->publicationRejected($email);
+        $scheduledPublications=$authorActivityDAO->publicationScheduled($email);
+        return array($publicationsSended,$queuedPublications,$publicationsAcepted,$publicationsRejected,$scheduledPublications);
     }
 }

@@ -6,10 +6,23 @@
     }
 </style>
 
+<script>
+  var checkboxValues = [];
+  function updateCheckboxValues(value) {
+    if (checkboxValues.includes(value)) {
+      checkboxValues = checkboxValues.filter(function(val) { return val !== value; });
+    } else {
+      checkboxValues.push(value);
+    }
+    
+    document.querySelector('input[name="selectedValues"]').value = checkboxValues;
+    
+  }
+</script>
 
 <div class="panel panel-default" style="width: fit-content; margin-right: 100px !important;">
     <div class="panel-heading">Usuarios en la base de datos</div>
-    <div class="panel-body">    
+    <div class="panel-body">
         {if $usersTable}
             <div class="table-responsive">
                 <table class="table">
@@ -60,7 +73,15 @@
 
                     </thead>
                     <tbody>
-                        {$usersTable}
+                   <!-- <form method="POST">
+                        <input type="hidden" name="selectedValues" value="">
+                        <input class="btn btn-warning" type="submit" value="Exportar">
+
+                    </form>-->
+                            
+                            {$usersTable}
+                            
+                        
                     </tbody>
                 </table>
             </div>

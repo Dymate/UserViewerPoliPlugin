@@ -23,7 +23,9 @@ class UserViewerPoliPlugin extends GenericPlugin
             import('plugins.generic.userViewerPoliPlugin.classes.ReviewerAssignmentsDAO');
             $reviewerAssignmentsDAO= new ReviewerAssignmentsDAO();
             DAORegistry::registerDAO('ReviewerAssignmentsDAO',$reviewerAssignmentsDAO);
-			
+            import('plugins.generic.userViewerPoliPlugin.classes.AuthorActivityDAO');
+            $authorActivityDAO= new AuthorActivityDAO();
+			DAORegistry::registerDAO('AuthorActivityDAO',$authorActivityDAO);
 			HookRegistry::register('Templates::Common::Footer::PageFooter', array($this, 'callbackShowUsersMenu'));
 
             HookRegistry::register('LoadHandler', array($this, 'setPageHandler'));
