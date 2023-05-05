@@ -68,16 +68,58 @@ class UsersListTableDAO extends DAO
         return $returner;
     }
 
-    public function searchUsers($sql)
+    public function searchUsers($name, $lastName, $username, $email, $country, $userRoles,$page)
     {
-        $result = $this->retrieveRange($sql);
+        $sql = "SELECT	search.user_id,search.firstName, search.lastName, search.university, search.academicDegree,search.biography, search.username, search.email,search.country, search.roles
+        FROM (  
+            SELECT u.user_id,
+                   MAX(CASE WHEN us.setting_name = 'givenName' THEN us.setting_value END) AS firstName,
+                   MAX(CASE WHEN us.setting_name = 'familyName' THEN us.setting_value END) AS lastName,
+                   MAX(CASE WHEN us.setting_name= 'affiliation' THEN us.setting_value END) as university,
+                   MAX(CASE WHEN us.setting_name= 'academicDegree' THEN us.setting_value END) as academicDegree,
+                   MAX(CASE WHEN us.setting_name= 'biography' THEN us.setting_value END) as biography,
+                   u.username,
+                   u.email,
+                   u.country,
+                   GROUP_CONCAT(DISTINCT uug.user_group_id SEPARATOR ',') AS roles
+            FROM users u 
+            LEFT JOIN user_settings us ON u.user_id = us.user_id
+            LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
+            GROUP BY u.user_id) search
+        WHERE 1=1 ";
+
+        if ($name) {
+            $sql .= "AND search.firstName LIKE '%$name%'";
+        }
+        if ($lastName) {
+            $sql .= "AND search.lastName LIKE '%$lastName%'";
+        }
+        if ($username) {
+            $sql .= "AND search.username LIKE '%$username%'";
+        }
+        if ($email) {
+            $sql .= "AND search.email LIKE '%$email%'";
+        }
+        if ($country) {
+            $sql .= "AND search.country LIKE '%$country%'";
+        }
+        if ($userRoles) {
+            if ($userRoles == 1) {
+                $sql .= "AND search.roles LIKE '%1,%'";
+            } else {
+                $sql .= "AND search.roles LIKE '%$userRoles%'";
+            }
+        }
+        $countResult=$this->countFilteredUsers($sql);
+        $sql.="limit ?,10";
+        $result = $this->retrieveRange($sql,array((($page - 1) * 10)));
         $returner = [];
         foreach ($result as $data) {
 
             $returner[] = $this->_fromRow($data);
         }
         #$result->Close();
-        return $returner;
+        return array($returner,$countResult);
     }
     public function countUsers()
     {
@@ -145,4 +187,11 @@ class UsersListTableDAO extends DAO
         }
         
     }
+    public function countFilteredUsers($sql)//se usa para contar el total de usuarios generados por el filtro
+    {   $changedSql= str_replace("search.user_id,search.firstName, search.lastName, search.university, search.academicDegree,search.biography, search.username, search.email,search.country, search.roles",
+        " count(*) as results",$sql);
+        $result = $this->retrieveRange($changedSql);
+        $resultCounted = intval(iterator_to_array($result)[0]->results);  
+        return $resultCounted; 
+    }  
 }
