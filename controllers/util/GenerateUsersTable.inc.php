@@ -176,7 +176,7 @@ class GenerateUsersTable{
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-success" type=submit>Actualizar</button>
+        <button class="btn btn-success" type=submit>Guardar</button>
         <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
 
         </form>
@@ -199,7 +199,7 @@ class GenerateUsersTable{
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-success" type=submit>Actualizar</button>
+        <button class="btn btn-success" type=submit>Guardar</button>
         <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
 
         </form>
@@ -222,7 +222,7 @@ class GenerateUsersTable{
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-success" type=submit>Actualizar</button>
+        <button class="btn btn-success" type=submit>Guardar</button>
         <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
 
         </form>

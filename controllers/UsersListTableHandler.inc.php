@@ -49,7 +49,8 @@ class UsersListTableHandler extends Handler
         $biography = isset($_POST['biography']) ? $_POST['biography'] : null;
         $country = isset($_POST['country']) ? $_POST['country'] : null;
         $userRoles = isset($_POST['roles']) ? $_POST['roles'] : null;
-
+        $needExport=isset($_POST['selectedValues'])?$_POST['selectedValues']:null;
+        
         //ASIGNACION DE VARIABLES DE LA TEMPLATE
         $templateMgr->assign("selectedCountryValue", $country);
         $templateMgr->assign("selectedRolesValue", $userRoles);
@@ -57,7 +58,7 @@ class UsersListTableHandler extends Handler
         $templateMgr->assign("optionsRoles", $optionsRoles);
         //$selectedUsers=isset($_POST['selectedValues']) ? $_POST['selectedValues'] : null;
        
-        
+        $needExport!=null?$this->exportUsers($needExport):null;
         list($data,$countResult)=$this->generateSearchFilter($name, $lastName, $username, $email, $country, $userRoles,$currentPage);
         if(isset($data)){
             $templateMgr->assign("usersTable", $generateUsersTable->listUsers($data));
@@ -65,7 +66,9 @@ class UsersListTableHandler extends Handler
         }else{
             $totalPages = $this->getTotalPages();
         }
-        
+       
+            
+   
         if (($university and $user_id) != null) {
             $this->updateUniversity($user_id, $university);
             $url = $_SERVER['REQUEST_URI'];
@@ -182,5 +185,9 @@ class UsersListTableHandler extends Handler
         $scheduledPublications=$authorActivityDAO->publicationScheduled($email);
         return array($publicationsSended,$queuedPublications,$publicationsAcepted,$publicationsRejected,$scheduledPublications);
     }
-   
+    public function exportUsers($selectedUsers){
+        require_once("util/exportUsersReport.inc.php");
+        $phpExcel= new exportUsersReport();
+        $phpExcel->exportUsers($selectedUsers);
+    }
 }

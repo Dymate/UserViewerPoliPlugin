@@ -22,6 +22,8 @@
 
 <div class="panel panel-default" style="width: fit-content; margin-right: 100px !important;">
     <div class="panel-heading">Usuarios en la base de datos</div>
+    <form method="POST">
+    </form>
     <div class="panel-body">
         {if $usersTable}
             <div class="table-responsive">
@@ -73,11 +75,11 @@
 
                     </thead>
                     <tbody>
-                   <!-- <form method="POST">
+                  <form method="POST">
                         <input type="hidden" name="selectedValues" value="">
                         <input class="btn btn-warning" type="submit" value="Exportar">
 
-                    </form>-->
+                    </form>
                             
                             {$usersTable}
                             

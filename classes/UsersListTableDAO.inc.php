@@ -194,4 +194,33 @@ class UsersListTableDAO extends DAO
         $resultCounted = intval(iterator_to_array($result)[0]->results);  
         return $resultCounted; 
     }  
+    public function getUserByID($userId)
+    {
+        $result = $this->retrieveRange(
+            'SELECT u.user_id, 
+                MAX(CASE WHEN us.setting_name = "givenName" THEN us.setting_value END) AS firstName,
+                MAX(CASE WHEN us.setting_name = "familyName" THEN us.setting_value END) AS lastName,
+                MAX(CASE WHEN us.setting_name= "affiliation" THEN us.setting_value END) as university,
+                MAX(CASE WHEN us.setting_name= "academicDegree" THEN us.setting_value END) as academicDegree,
+                MAX(CASE WHEN us.setting_name= "biography" THEN us.setting_value END) as biography,
+                u.username,
+                u.email,
+                u.country,
+                GROUP_CONCAT(DISTINCT uug.user_group_id SEPARATOR ",") AS roles
+                FROM users u 
+                LEFT JOIN user_settings us ON u.user_id = us.user_id
+                LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
+                WHERE u.user_id=?
+                GROUP BY u.user_id
+                ',
+            array($userId)
+        );
+
+        $returner = [];
+        foreach ($result as $data) {
+            $returner = $this->_fromRow($data);
+        }
+        #$result->Close();
+        return $returner;
+    }
 }
