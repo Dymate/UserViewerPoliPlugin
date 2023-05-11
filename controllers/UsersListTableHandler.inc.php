@@ -110,7 +110,7 @@ class UsersListTableHandler extends Handler
     public function paginationControl($currentPage, $totalPages)
     {   $urlActual = $_SERVER['REQUEST_URI'];
         if(strpos($urlActual, "page=")){
-            $posicion = strpos($urlActual, "page=").strlen("page="); // Busca la posición de "page="
+            $posicion = strpos($urlActual, "page=")+strlen("page="); // Busca la posición de "page="
             $urlActual = substr($urlActual, 0, $posicion);
         }
         else if(strpos($urlActual, "?")){
