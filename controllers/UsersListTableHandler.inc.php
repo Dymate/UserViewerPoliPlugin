@@ -30,6 +30,7 @@ class UsersListTableHandler extends Handler
         $generateUsersTable=$this->newGenerateUsersTable();
         $plugin = PluginRegistry::getPlugin("generic", "userviewerpoliplugin");
         $templateMgr = TemplateManager::getManager($request);
+        $templateMgr->addJavaScript('usersListTable', $plugin->getPluginBaseUrl() . '/js/usersListTable.js');
         $templateMgr->assign("userRoles", $roles); //Necesario para el botón usuarios
         $currentPage = isset($_GET["page"]) ? $_GET["page"] : 1;
         $data = $this->getAllUsers($currentPage);
@@ -39,16 +40,14 @@ class UsersListTableHandler extends Handler
         list($optionsCountry,$optionsRoles)=$userListComplements->setRolesAndCountries();
 
         //RECEPCION DE VARIABLES DEL FRONT
-        $name = isset($_POST['name']) ? $_POST['name'] : null;
-        $lastName = isset($_POST['lastname']) ? $_POST['lastname'] : null;
-        $username = isset($_POST['username']) ? $_POST['username'] : null;
-        $email = isset($_POST['email']) ? $_POST['email'] : null;
+        $name = isset($_GET['name']) ? $_GET['name'] : null;
+        $lastName = isset($_GET['lastnm']) ? $_GET['lastnm'] : null;
         $university = isset($_POST['university']) ? $_POST['university'] : null;
-        $user_id = isset($_POST['user_id']) ? $_POST['user_id'] : null;
+        $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : null;
         $newAcademicDegree = isset($_POST['newAcademicDegree']) ? $_POST['newAcademicDegree'] : null;
         $biography = isset($_POST['biography']) ? $_POST['biography'] : null;
-        $country = isset($_POST['country']) ? $_POST['country'] : null;
-        $userRoles = isset($_POST['roles']) ? $_POST['roles'] : null;
+        $country = isset($_GET['country']) ? $_GET['country'] : null;
+        $userRoles = isset($_GET['roles']) ? $_GET['roles'] : null;
         $needExport=isset($_POST['selectedValues'])?$_POST['selectedValues']:null;
         
         //ASIGNACION DE VARIABLES DE LA TEMPLATE
@@ -57,9 +56,9 @@ class UsersListTableHandler extends Handler
         $templateMgr->assign("optionsCountry", $optionsCountry);
         $templateMgr->assign("optionsRoles", $optionsRoles);
         //$selectedUsers=isset($_POST['selectedValues']) ? $_POST['selectedValues'] : null;
-       
+      
         $needExport!=null?$this->exportUsers($needExport):null;
-        list($data,$countResult)=$this->generateSearchFilter($name, $lastName, $username, $email, $country, $userRoles,$currentPage);
+        list($data,$countResult)=$this->generateSearchFilter($name, $lastName, $country, $userRoles,$currentPage);
         if(isset($data)){
             $templateMgr->assign("usersTable", $generateUsersTable->listUsers($data));
             $totalPages=ceil(($countResult) / 10);
@@ -90,12 +89,12 @@ class UsersListTableHandler extends Handler
         return $templateMgr->display($plugin->getTemplateResource("usersListTable.tpl"));
     }
 
-    public function generateSearchFilter($name, $lastName, $username, $email, $country, $userRoles,$currentPage)
+    public function generateSearchFilter($name, $lastName, $country, $userRoles,$currentPage)
     {
-        if (($name or $lastName or $username or $email or $country or $userRoles) != null)
+        if (($name or $lastName  or $country or $userRoles) != null)
         {
             $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
-            list($result,$countResult) = $usersListTableDAO->searchUsers($name, $lastName, $username, $email, $country, $userRoles,$currentPage);
+            list($result,$countResult) = $usersListTableDAO->searchUsers($name, $lastName, $country, $userRoles,$currentPage);
             return array($result,$countResult);
         }
         return null;
@@ -109,12 +108,21 @@ class UsersListTableHandler extends Handler
     }
     
     public function paginationControl($currentPage, $totalPages)
-    {
+    {   $urlActual = $_SERVER['REQUEST_URI'];
+        if(strpos($urlActual, "page=")){
+            $posicion = strpos($urlActual, "page=").strlen("page="); // Busca la posición de "page="
+            $urlActual = substr($urlActual, 0, $posicion);
+        }
+        else if(strpos($urlActual, "?")){
+            $urlActual=$urlActual."&page=";
+        }else{
+            $urlActual=$urlActual."?page=";
+        }
         $paginationControl = '<ul class="pagination">';
 
         if ($currentPage > 1) {
-            $paginationControl .= '<li><a href="?page=' . (1) . '" aria-label="Previous"><span aria-hidden="true">&laquo;&laquo;</span></a></li>';
-            $paginationControl .= '<li><a href="?page=' . ($currentPage - 1) . '" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>';
+            $paginationControl .= '<li><a href="'.$urlActual.'' . (1) . '" aria-label="Previous"><span aria-hidden="true">&laquo;&laquo;</span></a></li>';
+            $paginationControl .= '<li><a href="'.$urlActual.'' . ($currentPage - 1) . '" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>';
         }
 
         for ($i = ($currentPage - 5); $i <= $totalPages; $i++) {
@@ -122,14 +130,14 @@ class UsersListTableHandler extends Handler
                 if ($currentPage == $i) {
                     $paginationControl .= '<li class="active"><a href="">' . ($i) . '<span class="sr-only">(current)</span></a></li>';
                 } else {
-                    $paginationControl .= '<li><a href="?page=' . ($i) . '">' . ($i) . "</a></li>";
+                    $paginationControl .= '<li><a href="'.$urlActual.'' . ($i) . '">' . ($i) . "</a></li>";
                 }
             }
         }
 
         if ($currentPage < $totalPages) {
-            $paginationControl .= '<li><a href="?page=' . ($currentPage + 1) . '" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>';
-            $paginationControl .= '<li><a href="?page=' . $totalPages . '" aria-label="Next"><span aria-hidden="true">&raquo;&raquo;</span></a>';
+            $paginationControl .= '<li><a href="'.$urlActual.'=' . ($currentPage + 1) . '" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>';
+            $paginationControl .= '<li><a href="'.$urlActual.'' . $totalPages . '" aria-label="Next"><span aria-hidden="true">&raquo;&raquo;</span></a>';
         }
 
         $paginationControl .= "</ul>";

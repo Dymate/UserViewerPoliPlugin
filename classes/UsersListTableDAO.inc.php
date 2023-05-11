@@ -68,7 +68,7 @@ class UsersListTableDAO extends DAO
         return $returner;
     }
 
-    public function searchUsers($name, $lastName, $username, $email, $country, $userRoles,$page)
+    public function searchUsers($name, $lastName, $country, $userRoles,$page)
     {
         $sql = "SELECT	search.user_id,search.firstName, search.lastName, search.university, search.academicDegree,search.biography, search.username, search.email,search.country, search.roles
         FROM (  
@@ -93,12 +93,6 @@ class UsersListTableDAO extends DAO
         }
         if ($lastName) {
             $sql .= "AND search.lastName LIKE '%$lastName%'";
-        }
-        if ($username) {
-            $sql .= "AND search.username LIKE '%$username%'";
-        }
-        if ($email) {
-            $sql .= "AND search.email LIKE '%$email%'";
         }
         if ($country) {
             $sql .= "AND search.country LIKE '%$country%'";
