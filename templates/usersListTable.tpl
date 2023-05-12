@@ -1,7 +1,5 @@
 {include file="frontend/components/header.tpl" pageTitleTranslated=$title}
 
-<script type="text/javascript" src="../js/usersListTable.js"></script>
-
 <style>
     input[type="search"]::-webkit-search-cancel-button {
         -webkit-appearance: searchfield-cancel-button;
@@ -70,9 +68,12 @@
 
                     </thead>
                     <tbody>
-                        <form method="POST">
+                        <form method="POST" id="exportForm">
                             <input type="hidden" name="selectedValues" value="">
                             <input class="btn btn-warning" type="submit" value="Exportar">
+                            <input class="btn btn-danger" type=button value="Eliminar Selección"
+                                style="padding: 5px; margin: 5px; width:127px;" onclick="clearCheckboxValues();">
+
 
                         </form>
 
