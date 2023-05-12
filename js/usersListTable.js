@@ -1,7 +1,14 @@
-var checkboxValues = [];
 
+function clearCheckboxValues() {
+    console.log("entre a clear checkboxValues");
+    localStorage.removeItem('checkboxValues');
+    location.reload();
+}
+var checkboxValues = [];
 function updateCheckboxValues(value) {
-    checkboxValues = JSON.parse(localStorage.getItem('checkboxValues'));
+    if (JSON.parse(localStorage.getItem('checkboxValues'))) {
+        checkboxValues = JSON.parse(localStorage.getItem('checkboxValues'));
+    }
     if (checkboxValues.includes(value)) {
         checkboxValues = checkboxValues.filter(function (val) { return val !== value; });
     } else {
@@ -12,10 +19,7 @@ function updateCheckboxValues(value) {
     document.querySelector('input[name="selectedValues"]').value = checkboxValues;
 
 }
-function clearCheckboxValues() {
-    localStorage.removeItem('checkboxValues');
-    location.reload();
-}
+
 var form = document.getElementById('exportForm');
 form.addEventListener('submit', function (event) {
     event.preventDefault(); // Evitar que el formulario se envíe de forma tradicional
