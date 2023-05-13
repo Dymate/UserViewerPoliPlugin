@@ -68,7 +68,7 @@ class UsersListTableDAO extends DAO
         return $returner;
     }
 
-    public function searchUsers($name, $lastName, $country, $userRoles,$page)
+    public function searchUsers($name, $lastName, $country, $userRoles,$page,$isToFilter)
     {
         $sql = "SELECT	search.user_id,search.firstName, search.lastName, search.university, search.academicDegree,search.biography, search.username, search.email,search.country, search.roles
         FROM (  
@@ -105,7 +105,10 @@ class UsersListTableDAO extends DAO
             }
         }
         $countResult=$this->countFilteredUsers($sql);
-        $sql.="limit ?,10";
+        if($isToFilter){
+            $sql.="limit ?,10";
+        }
+        
         $result = $this->retrieveRange($sql,array((($page - 1) * 10)));
         $returner = [];
         foreach ($result as $data) {

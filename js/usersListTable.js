@@ -1,6 +1,5 @@
 
 function clearCheckboxValues() {
-    console.log("entre a clear checkboxValues");
     localStorage.removeItem('checkboxValues');
     location.reload();
 }
@@ -31,16 +30,15 @@ form.addEventListener('submit', function (event) {
 });
 // Al cargar la página, recuperar los valores del LocalStorage
 document.addEventListener('DOMContentLoaded', function () {
+
     var storedValues = localStorage.getItem('checkboxValues');
     if (storedValues) {
         checkboxValues = JSON.parse(storedValues);
 
-        // Marcar los checkboxes según los valores almacenados
-
     }
 });
 window.addEventListener('load', function () {
-    // Tu código aquí
+
     var checkboxes = document.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(function (checkbox) {
         var value = checkbox.value;
@@ -61,7 +59,27 @@ function sendInputValues(elementId) {
 
 
 }
+function checkChangesInLocalStorage() {
+    // Obtener el valor de la variable almacenada en el localStorage
 
+    if (localStorage.getItem('checkboxValues') != null) {
+        var selectedCheckboxes = JSON.parse(localStorage.getItem('checkboxValues'));
+    } else var selectedCheckboxes = [];
+    // Obtener una referencia al botón
+
+
+    var exportButton = document.getElementById('export');
+    var clearSelectionButton = document.getElementById('deleteSelection');
+    // Verificar el valor de la variable y habilitar o deshabilitar el botón
+    if (selectedCheckboxes.length > 0) {
+        exportButton.disabled = false; // Habilitar el botón
+        clearSelectionButton.disabled = false;
+    } else {
+        exportButton.disabled = true;
+        clearSelectionButton.disabled = true; // Deshabilitar el botón
+    }
+};
+setInterval(checkChangesInLocalStorage, 500);
 function modifyURI(elementId, parametro) {
     var urlActual = window.location.href;
 

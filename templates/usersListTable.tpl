@@ -7,9 +7,10 @@
 </style>
 
 
-
+<br>
+<br><br>
 <div class="panel panel-default" style="width: fit-content; margin-right: 100px !important;">
-    <div class="panel-heading">Usuarios en la base de datos</div>
+    <div class="panel-heading">Módulo de gestión para la búsqueda de usuarios</div>
     <form method="POST">
     </form>
     <div class="panel-body">
@@ -70,13 +71,15 @@
                     <tbody>
                         <form method="POST" id="exportForm">
                             <input type="hidden" name="selectedValues" value="">
-                            <input class="btn btn-warning" type="submit" value="Exportar">
-                            <input class="btn btn-danger" type=button value="Eliminar Selección"
-                                style="padding: 5px; margin: 5px; width:127px;" onclick="clearCheckboxValues();">
-
-
+                            <input class="btn btn-warning" type="submit" value="Exportar" id="export" disabled>
+                            <input class="btn btn-danger" type=button value="Eliminar Selección" id="deleteSelection"
+                                style="padding: 5px; margin: 5px; width:127px;" onclick="clearCheckboxValues();" disabled>
+                            
                         </form>
-
+                        <form method="POST" id="exportForm">
+                        <input type="hidden" name="exportAll" value="1">
+                        <input class="btn btn-primary" type="submit"  value="Exportar Todo">
+                        </form>
                         {$usersTable}
 
 

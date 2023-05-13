@@ -48,12 +48,17 @@ class UsersListTableHandler extends Handler
         $biography = isset($_POST['biography']) ? $_POST['biography'] : null;
         $country = isset($_GET['country']) ? $_GET['country'] : null;
         $userRoles = isset($_GET['roles']) ? $_GET['roles'] : null;
+        $exportAll = isset($_POST['exportAll']) ? $_POST['exportAll'] : null;
         if (isset($_SESSION['selectedValues'])) {
             $needExport = isset($_POST['selectedValues']) ? $_SESSION['selectedValues'] . $_POST['selectedValues'] : null;
             $_SESSION['selectedValues'] = $needExport;
         } else {
             $needExport = isset($_POST['selectedValues']) ? $_POST['selectedValues'] : null;
             $_SESSION['selectedValues'] = $needExport;
+        }
+        
+        if ($exportAll!=null){
+            $this->exportMassiveUsers($name,$lastName,$country,$userRoles);
         }
 
 
@@ -96,12 +101,19 @@ class UsersListTableHandler extends Handler
 
         return $templateMgr->display($plugin->getTemplateResource("usersListTable.tpl"));
     }
-
+    public function exportMassiveUsers($name, $lastName, $country, $userRoles)
+    {
+        require_once("util/exportUsersReport.inc.php");
+        $phpExcel = new exportUsersReport();
+        $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
+        list($result, $countResult) = $usersListTableDAO->searchUsers($name, $lastName, $country, $userRoles, 1, false);
+        $phpExcel->exportAllUsers($result);
+    }
     public function generateSearchFilter($name, $lastName, $country, $userRoles, $currentPage)
     {
         if (($name or $lastName  or $country or $userRoles) != null) {
             $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
-            list($result, $countResult) = $usersListTableDAO->searchUsers($name, $lastName, $country, $userRoles, $currentPage);
+            list($result, $countResult) = $usersListTableDAO->searchUsers($name, $lastName, $country, $userRoles, $currentPage, true);
             return array($result, $countResult);
         }
         return null;
