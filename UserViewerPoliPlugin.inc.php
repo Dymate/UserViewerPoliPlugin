@@ -63,7 +63,7 @@ class UserViewerPoliPlugin extends GenericPlugin
             $templateMgr->addStyleSheet('select2Style', '//select2.github.io/select2/select2-3.4.1/select2.css');
             $templateMgr->addStyleSheet('select2BootstrapStyle', '//fk.github.io/select2-bootstrap-css/css/select2-bootstrap.css');
             $templateMgr->addJavaScript('select2Script', '//select2.github.io/select2/select2-3.4.1/select2.js');
-
+            $templateMgr->addJavaScript('chart.js', 'https://cdn.jsdelivr.net/npm/chart.js');
             $templateMgr->addStyleSheet('userViewerPoliPluginGeneralStyles', $this->getPluginBaseUrl() . '/css/userViewerPluginGeneralStyles.css');
 
             //Se mapean las url cada una de las páginas del plugin

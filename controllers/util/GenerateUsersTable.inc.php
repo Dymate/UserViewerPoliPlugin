@@ -11,7 +11,7 @@ class GenerateUsersTable{
     public function __construct(){
     }
 
-    public function listUsers($data)
+    public function listUsers($data,$roles)
     {
         $userListComplements=$this->generateUsersListHandlerComplement();
         $table = '';
@@ -25,10 +25,13 @@ class GenerateUsersTable{
 
                   <td>' . $row->getFirstName() . '</td>
                   <td>' . $row->getLastName() . '</td>
-                  <td>' . $row->getCountry() . '</td>
-                  <td>' . $userListComplements->translateRolesIdToText($row->getRoles()) . '</td>
-                  
-                  <td>
+                  <td>' . $row->getCountry() . '</td>';
+                 if(!$roles){
+                 $table.= '<td>' . $userListComplements->translateRolesIdToText($row->getRoles()) . '</td>';
+                }else{
+                  $table.= '<td>         </td>';
+                }
+                  $table.='<td>
                       <button class="btn btn-warning"type="button" data-toggle="modal" data-target="#myModal' . $row->getUserId() . '">
                           <i class="glyphicon glyphicon-eye-open" style="color: black"></i>
                           

@@ -42,21 +42,21 @@ class UsersListTableDAO extends DAO
     public function getAllUsers($page)
     {
         $result = $this->retrieveRange(
-            'SELECT u.user_id, 
-                MAX(CASE WHEN us.setting_name = "givenName" THEN us.setting_value END) AS firstName,
-                MAX(CASE WHEN us.setting_name = "familyName" THEN us.setting_value END) AS lastName,
-                MAX(CASE WHEN us.setting_name= "affiliation" THEN us.setting_value END) as university,
-                MAX(CASE WHEN us.setting_name= "academicDegree" THEN us.setting_value END) as academicDegree,
-                MAX(CASE WHEN us.setting_name= "biography" THEN us.setting_value END) as biography,
+            "SELECT u.user_id, 
+                MAX(CASE WHEN us.setting_name = 'givenName' THEN us.setting_value END) AS firstName,
+                MAX(CASE WHEN us.setting_name = 'familyName' THEN us.setting_value END) AS lastName,
+                MAX(CASE WHEN us.setting_name= 'affiliation' THEN us.setting_value END) as university,
+                MAX(CASE WHEN us.setting_name= 'academicDegree' THEN us.setting_value END) as academicDegree,
+                MAX(CASE WHEN us.setting_name= 'biography' THEN us.setting_value END) as biography,
                 u.username,
                 u.email,
                 u.country,
-                GROUP_CONCAT(DISTINCT uug.user_group_id SEPARATOR ",") AS roles
+                GROUP_CONCAT(DISTINCT uug.user_group_id SEPARATOR ',') AS roles
                 FROM users u 
                 LEFT JOIN user_settings us ON u.user_id = us.user_id
                 LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
                 GROUP BY u.user_id
-                limit ?,10;',
+                limit ?,10;",
             array((($page - 1) * 10))
         );
 
@@ -68,7 +68,7 @@ class UsersListTableDAO extends DAO
         return $returner;
     }
 
-    public function searchUsers($name, $lastName, $country, $userRoles,$page,$isToFilter)
+    public function searchUsers($name, $lastName, $country, $userRoles, $page, $isToFilter)
     {
         $sql = "SELECT	search.user_id,search.firstName, search.lastName, search.university, search.academicDegree,search.biography, search.username, search.email,search.country, search.roles
         FROM (  
@@ -104,19 +104,19 @@ class UsersListTableDAO extends DAO
                 $sql .= "AND search.roles LIKE '%$userRoles%'";
             }
         }
-        $countResult=$this->countFilteredUsers($sql);
-        if($isToFilter){
-            $sql.="limit ?,10";
+        $countResult = $this->countFilteredUsers($sql);
+        if ($isToFilter) {
+            $sql .= "limit ?,10";
         }
-        
-        $result = $this->retrieveRange($sql,array((($page - 1) * 10)));
+
+        $result = $this->retrieveRange($sql, array((($page - 1) * 10)));
         $returner = [];
         foreach ($result as $data) {
 
             $returner[] = $this->_fromRow($data);
         }
         #$result->Close();
-        return array($returner,$countResult);
+        return array($returner, $countResult);
     }
     public function countUsers()
     {
@@ -172,25 +172,29 @@ class UsersListTableDAO extends DAO
         $result = $this->retrieveRange(
             'Select count(*) as results
             from user_settings 
-            where user_id=? and setting_name="academicDegree" ',array($user_id)
+            where user_id=? and setting_name="academicDegree" ',
+            array($user_id)
         );
         #Se convierte lazyCollection en array, se obtiene el stdObject de la posición 1 y se le extrae el valor y se convierte en entero
 
         $resultCounted = intval(iterator_to_array($result)[0]->results);
-        if($resultCounted>0){
+        if ($resultCounted > 0) {
             return true;
-        }else {
+        } else {
             return false;
         }
-        
     }
-    public function countFilteredUsers($sql)//se usa para contar el total de usuarios generados por el filtro
-    {   $changedSql= str_replace("search.user_id,search.firstName, search.lastName, search.university, search.academicDegree,search.biography, search.username, search.email,search.country, search.roles",
-        " count(*) as results",$sql);
+    public function countFilteredUsers($sql) //se usa para contar el total de usuarios generados por el filtro
+    {
+        $changedSql = str_replace(
+            "search.user_id,search.firstName, search.lastName, search.university, search.academicDegree,search.biography, search.username, search.email,search.country, search.roles",
+            " count(*) as results",
+            $sql
+        );
         $result = $this->retrieveRange($changedSql);
-        $resultCounted = intval(iterator_to_array($result)[0]->results);  
-        return $resultCounted; 
-    }  
+        $resultCounted = intval(iterator_to_array($result)[0]->results);
+        return $resultCounted;
+    }
     public function getUserByID($userId)
     {
         $result = $this->retrieveRange(
@@ -219,5 +223,54 @@ class UsersListTableDAO extends DAO
         }
         #$result->Close();
         return $returner;
+    }
+
+    public function getRolesByCountry($role)
+    {
+        $sql = "SELECT search.country, COUNT(search.country) as cant
+        FROM (
+            SELECT u.user_id, 
+                MAX(CASE WHEN us.setting_name = 'givenName' THEN us.setting_value END) AS firstName,
+                MAX(CASE WHEN us.setting_name = 'familyName' THEN us.setting_value END) AS lastName,
+                MAX(CASE WHEN us.setting_name = 'affiliation' THEN us.setting_value END) AS university,
+                MAX(CASE WHEN us.setting_name = 'academicDegree' THEN us.setting_value END) AS academicDegree,
+                MAX(CASE WHEN us.setting_name = 'biography' THEN us.setting_value END) AS biography,
+                u.username,
+                u.email,
+                u.country,
+                GROUP_CONCAT(DISTINCT uug.user_group_id SEPARATOR ',') AS roles
+            FROM users u 
+            LEFT JOIN user_settings us ON u.user_id = us.user_id
+            LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
+            GROUP BY u.user_id, u.country, u.username, u.email
+        ) AS search
+        WHERE 1=1 ";
+        if ($role != null) {
+            if ($role == 1) {
+                $sql .= "AND search.roles LIKE '%1,%'";
+            } else {
+                $sql .= "AND search.roles LIKE '%" . $role . "%'";
+            }
+        }
+        $sql .= " GROUP BY search.country";
+
+        $result = $this->retrieveRange(
+            $sql,
+            array($role)
+        );
+        $countries = [];
+        $cant = [];
+
+        foreach ($result as $data) {
+            if ($data->country == "") {
+                $sinDato = 'sin dato';
+                $countries[] = $sinDato;
+                $cant[] = $data->cant;
+            } else {
+                $countries[] = $data->country;
+                $cant[] = $data->cant;
+            }
+        }
+        return array($countries, $cant);
     }
 }

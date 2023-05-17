@@ -7,6 +7,7 @@ use function PHPSTORM_META\type;
 import("classes.handler.Handler");
 import("plugins.generic.userViewerPoliPlugin.controllers.util.UsersListTableHandlerComplements");
 import("plugins.generic.userViewerPoliPlugin.controllers.util.GenerateUsersTable");
+
 class UsersListTableHandler extends Handler
 {
     public function newUserListComplement()
@@ -34,7 +35,7 @@ class UsersListTableHandler extends Handler
         $templateMgr->assign("userRoles", $roles); //Necesario para el botón usuarios
         $currentPage = isset($_GET["page"]) ? $_GET["page"] : 1;
         $data = $this->getAllUsers($currentPage);
-        $templateMgr->assign("usersTable", $generateUsersTable->listUsers($data));
+        $templateMgr->assign("usersTable", $generateUsersTable->listUsers($data,null));
         $selectedCountryValue = "";
         $selectedRolesValue = "";
         list($optionsCountry, $optionsRoles) = $userListComplements->setRolesAndCountries();
@@ -61,8 +62,6 @@ class UsersListTableHandler extends Handler
             $this->exportMassiveUsers($name,$lastName,$country,$userRoles);
         }
 
-
-
         //ASIGNACION DE VARIABLES DE LA TEMPLATE
         $templateMgr->assign("selectedCountryValue", $country);
         $templateMgr->assign("selectedRolesValue", $userRoles);
@@ -73,14 +72,17 @@ class UsersListTableHandler extends Handler
         $needExport != null ? $this->exportUsers($needExport) : null;
         list($data, $countResult) = $this->generateSearchFilter($name, $lastName, $country, $userRoles, $currentPage);
         if (isset($data)) {
-            $templateMgr->assign("usersTable", $generateUsersTable->listUsers($data));
+            $templateMgr->assign("usersTable", $generateUsersTable->listUsers($data,$userRoles));
             $totalPages = ceil(($countResult) / 10);
+            $templateMgr->assign("totalUsers",$countResult);
+            
         } else {
             $totalPages = $this->getTotalPages();
+            $templateMgr->assign("totalUsers","∼".$totalPages*10);
         }
-
-
-
+        
+        $this->generateDataFromChart($userRoles,$templateMgr);
+    
         if (($university and $user_id) != null) {
             $this->updateUniversity($user_id, $university);
             $url = $_SERVER['REQUEST_URI'];
@@ -127,7 +129,7 @@ class UsersListTableHandler extends Handler
     }
 
     public function paginationControl($currentPage, $totalPages)
-    {
+    {   
         $urlActual = $_SERVER['REQUEST_URI'];
         if (strpos($urlActual, "page=")) {
             $posicion = strpos($urlActual, "page=") + strlen("page="); // Busca la posición de "page="
@@ -219,5 +221,14 @@ class UsersListTableHandler extends Handler
         require_once("util/exportUsersReport.inc.php");
         $phpExcel = new exportUsersReport();
         $phpExcel->exportUsers($selectedUsers);
+    }
+    public function generateDataFromChart($role,$templateMgr){
+        $usersListTableDAO=DAORegistry::getDAO("UsersListTableDAO");
+        list($labels,$data)=$usersListTableDAO->getRolesByCountry($role);
+        $jsonLabels=json_encode($labels);
+        $jsonData=json_encode($data);
+        
+        $templateMgr->assign("labels", $jsonLabels);
+        $templateMgr->assign("data", $jsonData);
     }
 }
