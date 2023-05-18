@@ -1,19 +1,11 @@
 <?php
 
 import('lib.pkp.classes.db.DAO');
-import('plugins.generic.userViewerPoliPlugin.classes.reviewerAssignments');
+
 
 class ReviewerAssignmentsDAO extends DAO{
- /**
-     * Generate a new object.
-     * @return ReviewerAssignments
-     */
-
-    public function newDataObject()
-    {
-        return new ReviewerAssignments();
-    }
-
+ 
+    
     public function countCompletedReviews($user_id){
         $result = $this->retrieveRange(
             'SELECT COUNT(CASE WHEN ra.date_completed IS NOT NULL AND ra.declined = 0 THEN 1 END) AS complete_count

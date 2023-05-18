@@ -1,11 +1,13 @@
 <?php
 
-class UsersListTableHandlerComplements 
+class UsersListTableHandlerComplements
 {
-    public function __construct() {
-      }
+    public function __construct()
+    {
+    }
 
-    public function setRolesAndCountries(){
+    public function setRolesAndCountries()
+    {
         $optionsCountry = array(
             '' => 'Todos',
             'CO' => 'Colombia',
@@ -51,7 +53,7 @@ class UsersListTableHandlerComplements
             '17' => 'Lector/a',
             '18' => 'Gestor/a de suscripción'
         );
-        return array($optionsCountry,$optionsRoles);
+        return array($optionsCountry, $optionsRoles);
     }
     public function translateRolesIdToText($roles)
     {
@@ -122,5 +124,55 @@ class UsersListTableHandlerComplements
             $convertedRoles = substr_replace($convertedRoles, '', $lastOccurrence, 1);
         }
         return $convertedRoles;
+    }
+    public function completeCountryName($country)
+    {
+        switch ($country) {
+            case "CO":
+               return '<p>Colombia</p>';
+            case "VE":
+                return "<p>Venezuela</p>";
+            case "EC":
+                return "<p>Ecuador</p>";
+            case "PE":
+                return "<p>Peru</p>";
+            case "BR":
+                return "<p>Brazil</p>";
+            case "BO":
+                return "<p>Bolivia</p>";
+            case "PY":
+                return "<p>Paraguay</p>";
+            case "CL":
+                return "<p>Chile</p>";
+            case "UR":
+                return "<p>Uruguay</p>";
+            case "AR":
+                return "<p>Argentina</p>";
+            case "MX":
+                return "<p>Mexico</p>";
+            case "CR":
+                return "<p>CostaRica</p>";
+            case "RD":
+                return "<p>Republica Dominicana</p>";
+            case "PA":
+                return "<p>Panama</p>";
+            case "US":
+                return "<p>EstadosUnidos</p>";
+            case "ES":
+                return "<p>España</p>";
+            case "CA":
+                return "<p>Canada</p>";
+            case "IT":
+                return "<p>Italia</p>";
+            case "CU":
+                return "<p>Cuba</p>";
+            case "AF":
+                return "<p>Afganistan</p>";
+            case "HA":
+                return "<p>Honduras</p>";
+            
+            default:
+                return "<p>sinPais</p>";
+        }
     }
 }

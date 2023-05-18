@@ -1,11 +1,8 @@
 <?php
 import('lib.pkp.classes.db.DAO');
-import('plugins.generic.userViewerPoliPlugin.classes.AuthorActivity');
+
 class AuthorActivityDAO extends DAO{
-    public function newDataObject()
-    {
-        return new AuthorActivity();
-    }
+   
 
 public function publicationSended($email){
 

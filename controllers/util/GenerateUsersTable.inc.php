@@ -25,7 +25,7 @@ class GenerateUsersTable{
 
                   <td>' . $row->getFirstName() . '</td>
                   <td>' . $row->getLastName() . '</td>
-                  <td>' . $row->getCountry() . '</td>';
+                  <td>' .  $userListComplements->completeCountryName($row->getCountry()) . '</td>';
                  if(!$roles){
                  $table.= '<td>' . $userListComplements->translateRolesIdToText($row->getRoles()) . '</td>';
                 }else{

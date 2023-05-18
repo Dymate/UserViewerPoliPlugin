@@ -22,7 +22,7 @@ class UsersListTableHandler extends Handler
     {
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_COMMON, LOCALE_COMPONENT_APP_COMMON, LOCALE_COMPONENT_PKP_USER);
         $roles = $this->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
-        if (count(array_intersect(array(ROLE_ID_SITE_ADMIN), $roles)) == 0) {
+        if (count(array_intersect(array(ROLE_ID_SITE_ADMIN,ROLE_ID_MANAGER), $roles)) == 0) {
             header('HTTP/1.0 403 Forbidden');
             return print('<h2>Acceso denegado</h2>No tienes permitido ingresar a esta sección.');
         }
@@ -60,6 +60,8 @@ class UsersListTableHandler extends Handler
         
         if ($exportAll!=null){
             $this->exportMassiveUsers($name,$lastName,$country,$userRoles);
+            $url = $_SERVER['REQUEST_URI'];
+            header("Location: $url");
         }
 
         //ASIGNACION DE VARIABLES DE LA TEMPLATE
@@ -69,7 +71,12 @@ class UsersListTableHandler extends Handler
         $templateMgr->assign("optionsRoles", $optionsRoles);
         //$selectedUsers=isset($_POST['selectedValues']) ? $_POST['selectedValues'] : null;
 
-        $needExport != null ? $this->exportUsers($needExport) : null;
+        if($needExport != null) {
+            $_SESSION['selectedValues']=""; //se reinicia la variable global para evitar bugs en la exportación
+            $this->exportUsers($needExport);
+           
+            
+        } 
         list($data, $countResult) = $this->generateSearchFilter($name, $lastName, $country, $userRoles, $currentPage);
         if (isset($data)) {
             $templateMgr->assign("usersTable", $generateUsersTable->listUsers($data,$userRoles));
@@ -105,7 +112,7 @@ class UsersListTableHandler extends Handler
     }
     public function exportMassiveUsers($name, $lastName, $country, $userRoles)
     {
-        require_once("util/exportUsersReport.inc.php");
+        require_once("util/ExportUsersReport.inc.php");
         $phpExcel = new exportUsersReport();
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
         list($result, $countResult) = $usersListTableDAO->searchUsers($name, $lastName, $country, $userRoles, 1, false);
@@ -218,7 +225,7 @@ class UsersListTableHandler extends Handler
     }
     public function exportUsers($selectedUsers)
     {
-        require_once("util/exportUsersReport.inc.php");
+        require_once("util/ExportUsersReport.inc.php");
         $phpExcel = new exportUsersReport();
         $phpExcel->exportUsers($selectedUsers);
     }

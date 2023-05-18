@@ -11,7 +11,6 @@
 <br><br><br>
 
 <div class="panel panel-default" style="width: fit-content; margin-right: 100px !important;">
-
     <div class="panel-heading">Módulo de gestión para la búsqueda de usuarios</div>
     <form method="POST">
     </form>
@@ -20,7 +19,7 @@
             <div class="table-responsive">
                 <table class="table">
                     <thead>
-
+                   
                         <th>
 
                         </th>

@@ -18,7 +18,7 @@ class UsersListTableDAO extends DAO
 
     /**
      * Return a new object from a given row.
-     * @return class UsersListTable extends DataObject {
+     * @return UsersListTable extends DataObject {
 
      */
     public function _fromRow($row)
@@ -101,7 +101,7 @@ class UsersListTableDAO extends DAO
             if ($userRoles == 1) {
                 $sql .= "AND search.roles LIKE '%1,%'";
             } else {
-                $sql .= "AND search.roles LIKE '%$userRoles%'";
+                $sql .= "AND search.roles =".$userRoles." ";
             }
         }
         $countResult = $this->countFilteredUsers($sql);
@@ -263,7 +263,7 @@ class UsersListTableDAO extends DAO
 
         foreach ($result as $data) {
             if ($data->country == "") {
-                $sinDato = 'sin dato';
+                $sinDato = 'sin país';
                 $countries[] = $sinDato;
                 $cant[] = $data->cant;
             } else {

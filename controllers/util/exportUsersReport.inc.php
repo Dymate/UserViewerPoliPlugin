@@ -9,13 +9,14 @@ class exportUsersReport
 {
 
     public function exportUsers($usersToExport)
-    {
-
+    {   
+     
+    
         $usersToExport = str_replace(['"', "[", "]"], "", $usersToExport);
         $arrayUsersId = explode(",", $usersToExport);
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
         $UserListComplements = new UsersListTableHandlerComplements();
-
+       
         // Crear instancia de Spreadsheet
         $spreadsheet = new Spreadsheet();
 
@@ -37,6 +38,7 @@ class exportUsersReport
         // Obtener datos de la base de datos y agregarlos a la hoja de cálculo
         foreach ($arrayUsersId as $userId) {
             $user = $usersListTableDAO->getUserById($userId);
+            if ($user !== null) {
             $sheet->setCellValue('A' . $index, $user->getUserId());
             $sheet->setCellValue('B' . $index, $user->getFirstName());
             $sheet->setCellValue('C' . $index, $user->getLastName());
@@ -48,6 +50,7 @@ class exportUsersReport
             $sheet->setCellValue('I' . $index,  $user->getEmail());
             $roles = $UserListComplements->translateRolesIdToText($user->getRoles());
             $sheet->setCellValue('J' . $index, $roles);
+            }
             $index++;
         }
         // Guardar archivo en una ruta temporal
