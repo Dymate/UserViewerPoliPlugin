@@ -10,27 +10,67 @@ class UsersListTableHandlerComplements
     {
         $optionsCountry = array(
             '' => 'Todos',
-            'CO' => 'Colombia',
-            'VE' => 'Venezuela',
-            'EC' => 'Ecuador',
-            'PE' => 'Perú',
-            'BR' => 'Brazil',
-            'BO' => 'Bolivia',
-            'PY' => 'Paraguay',
-            'CL' => 'Chile',
-            'UR' => 'Uruguay',
+            'AF' => 'Afganistán',
+            'AM' => 'Armenia',
+            'AQ' => 'Antártida',
             'AR' => 'Argentina',
-            'MX' => 'México',
-            'CR' => 'Costa Rica',
-            'RD' => 'Republica Dominicana',
-            'PA' => 'Panamá',
-            'US' => 'Estados Unidos',
-            'ES' => 'España',
+            'AT' => 'Austria',
+            'AU' => 'Australia',
+            'BA' => 'Bosnia y Herzegovina',
+            'BB' => 'Barbados',
+            'BE' => 'Bélgica',
+            'BF' => 'Burkina Faso',
+            'BJ' => 'Benín',
+            'BM' => 'Bermudas',
+            'BN' => 'Brunéi',
+            'BO' => 'Bolivia',
+            'BR' => 'Brasil',
             'CA' => 'Canadá',
-            'IT' => 'Italia',
+            'CD' => 'República Democrática del Congo',
+            'CL' => 'Chile',
+            'CO' => 'Colombia',
+            'CR' => 'Costa Rica',
             'CU' => 'Cuba',
-            'AF' => 'Afganistan',
-            'HA' => 'Honduras'
+            'DE' => 'Alemania',
+            'DO' => 'República Dominicana',
+            'EC' => 'Ecuador',
+            'EE' => 'Estonia',
+            'EG' => 'Egipto',
+            'ES' => 'España',
+            'GA' => 'Gabón',
+            'GF' => 'Guayana Francesa',
+            'GS' => 'Islas Georgia del Sur y Sandwich del Sur',
+            'GT' => 'Guatemala',
+            'HN' => 'Honduras',
+            'HR' => 'Croacia',
+            'HU' => 'Hungría',
+            'ID' => 'Indonesia',
+            'IE' => 'Irlanda',
+            'IN' => 'India',
+            'IT' => 'Italia',
+            'JO' => 'Jordania',
+            'KR' => 'Corea del Sur',
+            'LA' => 'Laos',
+            'LT' => 'Lituania',
+            'MA' => 'Marruecos',
+            'MF' => 'San Martín (parte francesa)',
+            'ML' => 'Malí',
+            'MP' => 'Islas Marianas del Norte',
+            'MW' => 'Malaui',
+            'MX' => 'México',
+            'NR' => 'Nauru',
+            'PE' => 'Perú',
+            'PG' => 'Papúa Nueva Guinea',
+            'PR' => 'Puerto Rico',
+            'PT' => 'Portugal',
+            'SO' => 'Somalia',
+            'SV' => 'El Salvador',
+            'UA' => 'Ucrania',
+            'UG' => 'Uganda',
+            'US' => 'Estados Unidos',
+            'UY' => 'Uruguay',
+            'VE' => 'Venezuela',
+            'ZM' => 'Zambia'
         );
         $optionsRoles = array(
             '' => 'Todos',
@@ -128,51 +168,130 @@ class UsersListTableHandlerComplements
     public function completeCountryName($country)
     {
         switch ($country) {
-            case "CO":
-               return '<p>Colombia</p>';
-            case "VE":
-                return "<p>Venezuela</p>";
-            case "EC":
-                return "<p>Ecuador</p>";
-            case "PE":
-                return "<p>Peru</p>";
-            case "BR":
-                return "<p>Brazil</p>";
-            case "BO":
-                return "<p>Bolivia</p>";
-            case "PY":
-                return "<p>Paraguay</p>";
-            case "CL":
-                return "<p>Chile</p>";
-            case "UR":
-                return "<p>Uruguay</p>";
-            case "AR":
-                return "<p>Argentina</p>";
-            case "MX":
-                return "<p>Mexico</p>";
-            case "CR":
-                return "<p>CostaRica</p>";
-            case "RD":
-                return "<p>Republica Dominicana</p>";
-            case "PA":
-                return "<p>Panama</p>";
-            case "US":
-                return "<p>EstadosUnidos</p>";
-            case "ES":
-                return "<p>España</p>";
-            case "CA":
-                return "<p>Canada</p>";
-            case "IT":
-                return "<p>Italia</p>";
-            case "CU":
-                return "<p>Cuba</p>";
             case "AF":
-                return "<p>Afganistan</p>";
-            case "HA":
-                return "<p>Honduras</p>";
-            
+                return '<p>Afganistán</p>';
+            case "AM":
+                return '<p>Armenia</p>';
+            case "AQ":
+                return '<p>Antártida</p>';
+            case "AR":
+                return '<p>Argentina</p>';
+            case "AT":
+                return '<p>Austria</p>';
+            case "AU":
+                return '<p>Australia</p>';
+            case "BA":
+                return '<p>Bosnia y Herzegovina</p>';
+            case "BB":
+                return '<p>Barbados</p>';
+            case "BE":
+                return '<p>Bélgica</p>';
+            case "BF":
+                return '<p>Burkina Faso</p>';
+            case "BJ":
+                return '<p>Benín</p>';
+            case "BM":
+                return '<p>Bermudas</p>';
+            case "BN":
+                return '<p>Brunéi</p>';
+            case "BO":
+                return '<p>Bolivia</p>';
+            case "BR":
+                return '<p>Brasil</p>';
+            case "CA":
+                return '<p>Canadá</p>';
+            case "CD":
+                return '<p>República Democrática del Congo</p>';
+            case "CL":
+                return '<p>Chile</p>';
+            case "CO":
+                return '<p>Colombia</p>';
+            case "CR":
+                return '<p>Costa Rica</p>';
+            case "CU":
+                return '<p>Cuba</p>';
+            case "DE":
+                return '<p>Alemania</p>';
+            case "DO":
+                return '<p>República Dominicana</p>';
+            case "EC":
+                return '<p>Ecuador</p>';
+            case "EE":
+                return '<p>Estonia</p>';
+            case "EG":
+                return '<p>Egipto</p>';
+            case "ES":
+                return '<p>España</p>';
+            case "GA":
+                return '<p>Gabón</p>';
+            case "GF":
+                return '<p>Guayana Francesa</p>';
+            case "GS":
+                return '<p>Islas Georgia del Sur y Sandwich del Sur</p>';
+            case "GT":
+                return '<p>Guatemala</p>';
+            case "HN":
+                return '<p>Honduras</p>';
+            case "HR":
+                return '<p>Croacia</p>';
+            case "HU":
+                return '<p>Hungría</p>';
+            case "ID":
+                return '<p>Indonesia</p>';
+            case "IE":
+                return '<p>Irlanda</p>';
+            case "IN":
+                return '<p>India</p>';
+            case "IT":
+                return '<p>Italia</p>';
+            case "JO":
+                return '<p>Jordania</p>';
+            case "KR":
+                return '<p>Corea del Sur</p>';
+            case "LA":
+                return '<p>Laos</p>';
+            case "LT":
+                return '<p>Lituania</p>';
+            case "MA":
+                return '<p>Marruecos</p>';
+            case "MF":
+                return '<p>San Martín (parte francesa)</p>';
+            case "ML":
+                return '<p>Malí</p>';
+            case "MP":
+                return '<p>Islas Marianas del Norte</p>';
+            case "MW":
+                return '<p>Malaui</p>';
+            case "MX":
+                return '<p>México</p>';
+            case "NR":
+                return '<p>Nauru</p>';
+            case "PE":
+                return '<p>Perú</p>';
+            case "PG":
+                return '<p>Papúa Nueva Guinea</p>';
+            case "PR":
+                return '<p>Puerto Rico</p>';
+            case "PT":
+                return '<p>Portugal</p>';
+            case "SO":
+                return '<p>Somalia</p>';
+            case "SV":
+                return '<p>El Salvador</p>';
+            case "UA":
+                return '<p>Ucrania</p>';
+            case "UG":
+                return '<p>Uganda</p>';
+            case "US":
+                return '<p>Estados Unidos</p>';
+            case "UY":
+                return '<p>Uruguay</p>';
+            case "VE":
+                return '<p>Venezuela</p>';
+            case "ZM":
+                return '<p>Zambia</p>';
             default:
-                return "<p>sinPais</p>";
+                return 'Sin país';
         }
     }
 }
