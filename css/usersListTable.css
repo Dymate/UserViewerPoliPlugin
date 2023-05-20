@@ -1,0 +1,38 @@
+input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: searchfield-cancel-button;
+}
+
+.table-responsive {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.user-name {
+    background: linear-gradient(to right, #07a93b 50%, #57b627 50%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.btn-activity {
+    background: linear-gradient(to right, #07a93b, #4eca10);
+    color: white;
+}
+
+.data-name {
+    color: #07a93b;
+}
+
+.my-icon {
+    position: absolute;
+    left: 5px;
+    /* Ajusta la posición del icono */
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.project-title {
+    display: flex;
+    justify-content: space-around;
+    font-weight: bold;
+    font-size: large;
+    background-color: white;
+}

@@ -1,6 +1,13 @@
 <?php
 
-
+/*
+ *
+ * Plugin Gestión de búsqueda de usuarios
+ * Dylan Mateo Llano Jaramillo & Juan José Restrepo Correa
+ * Politécnico Colombiano Jaime Isaza Cadavid
+ * Medellín-Colombia Mayo de 2023
+ *
+ */
 import('lib.pkp.classes.core.PKPRequest');
 import('lib.pkp.classes.plugins.GenericPlugin');
 
@@ -8,15 +15,15 @@ import('lib.pkp.classes.plugins.GenericPlugin');
 class UserViewerPoliPlugin extends GenericPlugin
 {
     public function register($category, $path, $mainContextId = null)
-    {
+    {   //Se obtiene el administrador de plantillas
 		$templateMgr = TemplateManager::getManager();
 
-        // Register the plugin even when it is not enabled
+        // Se registra el plugin incluso cuando no está activado
         $success = parent::register($category, $path);
 
         if ($success && $this->getEnabled()) 
 		{
-
+            //si el plugin está activado se registran los DAO, y los hooks
             import('plugins.generic.userViewerPoliPlugin.classes.UsersListTableDAO');
             $usersListTableDAO = new UsersListTableDAO();
             DAORegistry::registerDAO('UsersListTableDAO', $usersListTableDAO);
@@ -26,8 +33,9 @@ class UserViewerPoliPlugin extends GenericPlugin
             import('plugins.generic.userViewerPoliPlugin.classes.AuthorActivityDAO');
             $authorActivityDAO= new AuthorActivityDAO();
 			DAORegistry::registerDAO('AuthorActivityDAO',$authorActivityDAO);
+            //Se registra la navbar con el botón de usuarios con el método callbackShowUsersMenu
 			HookRegistry::register('Templates::Common::Footer::PageFooter', array($this, 'callbackShowUsersMenu'));
-
+            //Se registra la PageHandler con el metodo setPageHandler
             HookRegistry::register('LoadHandler', array($this, 'setPageHandler'));
 		}
 		
@@ -42,7 +50,7 @@ class UserViewerPoliPlugin extends GenericPlugin
         $templateMgr = TemplateManager::getManager($request);
         $output .= $templateMgr->fetch($this->getTemplateResource('usersNavBar.tpl'));
 
-        // Permit other plugins to continue interacting with this hook
+        // permite otros plugins interactuar con este hook
         return false;
     }
 
@@ -66,10 +74,7 @@ class UserViewerPoliPlugin extends GenericPlugin
             $templateMgr->addJavaScript('chart.js', 'https://cdn.jsdelivr.net/npm/chart.js');
             $templateMgr->addStyleSheet('userViewerPoliPluginGeneralStyles', $this->getPluginBaseUrl() . '/css/userViewerPluginGeneralStyles.css');
 
-            //Se mapean las url cada una de las páginas del plugin
-
-            // http://localhost/index.php/pol/summariespoliplugin-history
-            // http://{site_url}/index.php/pol/summariespoliplugin-history
+            //Se mapean las url de cada una de las vistas del plugin
             if ($page === 'userviewerpoliplugin-list') {
                 $this->import('controllers/UsersListTableHandler');
                 define('HANDLER_CLASS', 'UsersListTableHandler');

@@ -1,47 +1,8 @@
 {include file="frontend/components/header.tpl" pageTitleTranslated=$title}
 
-<style>
-    input[type="search"]::-webkit-search-cancel-button {
-        -webkit-appearance: searchfield-cancel-button;
-    }
-
-    .table-responsive {
-        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    }
-
-    .user-name {
-        background: linear-gradient(to right, #07a93b 50%, #57b627 50%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .btn-activity {
-        background: linear-gradient(to right, #07a93b, #4eca10);
-        color: white;
-    }
-
-    .data-name {
-        color: #07a93b;
-    }
-    .my-icon {
-      position: absolute;
-      left: 5px; /* Ajusta la posición del icono */
-      top: 50%;
-      transform: translateY(-50%);
-    }
-.project-title{
-    display: flex;
-    justify-content: space-around;
-    font-weight: bold;
-    font-size: large;
-    background-color: white;
-}
-</style>
-
-
 
 <br><br><br>
-
+<!--Vista principal del plugin, muestra la tabla con sus respectivas funciones -->
 <div class="panel panel-default" style="width: fit-content; margin-right: 100px !important;">
     <div class="panel-heading project-title">Módulo de gestión para la búsqueda de usuarios</div>
     <form method="POST">
@@ -61,13 +22,13 @@
                                 <!--<input type="text" id="name" name="name" onchange="this.form.submit();"
                                     value="{$smarty.post.name}"> -->
                                 <input type="text" id="name" name="name" onchange="sendInputValues('name');"
-                                    value="{$smarty.get.name}">
+                                    value="{$smarty.get.name}" maxlength="75">
 
                             </th>
                             <th>
                                 Apellido
                                 <input type="text" id="lastnm" name="lastnm" onchange="sendInputValues('lastnm');"
-                                    value="{$smarty.get.lastnm}">
+                                    value="{$smarty.get.lastnm}" maxlength="50">
                             </th>
                             <th>
                                 País
@@ -142,6 +103,8 @@
                                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                                         <canvas id="myChart"></canvas>
                                         <script>
+                                        //Se deja este script en la parte de la vista debido a multiples problemas
+                                        // a la hora de mostrarlo en la ventana modal
                                             var canvas = document.getElementById('myChart');
                                             var ctx = canvas.getContext("2d");
                                             var data = {$data};

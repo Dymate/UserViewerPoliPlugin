@@ -1,5 +1,12 @@
 <?php
-
+/*
+ *
+ * Módolo de Gestión para la búsqueda de usuarios
+ * Dylan Mateo Llano Jaramillo & Juan José Restrepo Correa
+ * Politécnico Colombiano Jaime Isaza Cadavid
+ * Medellín-Colombia Mayo de 2023
+ *
+ */
 class UsersListTable extends DataObject
 { 
     /* Getter Setter Id usuario*/
@@ -78,7 +85,9 @@ class UsersListTable extends DataObject
     public function setCountry($country)
     {
         return $this->setData('country', $country);
+
     }
+    //getter setter Roles
     public function getRoles(){
         return $this->getData('roles');
     }

@@ -1,5 +1,12 @@
 <?php
-
+/*
+ *
+ * Módolo de Gestión para la búsqueda de usuarios
+ * Dylan Mateo Llano Jaramillo & Juan José Restrepo Correa
+ * Politécnico Colombiano Jaime Isaza Cadavid
+ * Medellín-Colombia Mayo de 2023
+ *
+ */
 import('lib.pkp.classes.db.DAO');
 import('plugins.generic.userViewerPoliPlugin.classes.UsersListTable');
 class UsersListTableDAO extends DAO
@@ -21,6 +28,8 @@ class UsersListTableDAO extends DAO
      * @return UsersListTable extends DataObject {
 
      */
+
+    //Permite convertir los datos provenientes de la BD en un objeto
     public function _fromRow($row)
     {
         $usersListTable = $this->newDataObject();
@@ -38,10 +47,16 @@ class UsersListTableDAO extends DAO
 
         return $usersListTable;
     }
-
+    //consulta SQL para traer todos los usuarios en la BD
+    //está limitado por la sentencia limit el cual obliga a mostrar 10 registros por página
     public function getAllUsers($page)
     {
         $result = $this->retrieveRange(
+            //(CASE WHEN) condicional de MySQL
+            //Trae el valor despues del THEN si se cumple el CASE WHEN
+            /*se utiliza la función GROUP_CONCAT junto con la cláusula DISTINCT para concatenar 
+            los valores de la columna user_group_id de la tabla uug
+             en una única cadena separada por comas (',').*/
             "SELECT u.user_id, 
                 MAX(CASE WHEN us.setting_name = 'givenName' THEN us.setting_value END) AS firstName,
                 MAX(CASE WHEN us.setting_name = 'familyName' THEN us.setting_value END) AS lastName,
@@ -68,8 +83,15 @@ class UsersListTableDAO extends DAO
         return $returner;
     }
 
+    //Este método construye la consulta SQL dependiendo que parámetros le lleguen.
+    //$isToFilter variable booleana para saber si el metodo se usará 
+    //para filtrar usuarios o exportarlos
     public function searchUsers($name, $lastName, $country, $userRoles, $page, $isToFilter)
-    {
+    { //(CASE WHEN) condicional de MySQL
+        //Trae el valor despues del THEN si se cumple el CASE WHEN
+        /*se utiliza la función GROUP_CONCAT junto con la cláusula DISTINCT para concatenar 
+        los valores de la columna user_group_id de la tabla uug
+        en una única cadena separada por comas (',').*/
         $sql = "SELECT	search.user_id,search.firstName, search.lastName, search.university, search.academicDegree,search.biography, search.username, search.email,search.country, search.roles
         FROM (  
             SELECT u.user_id,
@@ -101,7 +123,7 @@ class UsersListTableDAO extends DAO
             if ($userRoles == 1) {
                 $sql .= "AND search.roles LIKE '%1,%'";
             } else {
-                $sql .= "AND search.roles =".$userRoles." ";
+                $sql .= "AND search.roles =" . $userRoles . " ";
             }
         }
         $countResult = $this->countFilteredUsers($sql);
@@ -118,6 +140,7 @@ class UsersListTableDAO extends DAO
         #$result->Close();
         return array($returner, $countResult);
     }
+    //Cuanta los usuarios en la BD para realizar la paginación
     public function countUsers()
     {
         $result = $this->retrieveRange(
@@ -129,6 +152,8 @@ class UsersListTableDAO extends DAO
         $totalUsers = intval(iterator_to_array($result)[0]->users);
         return $totalUsers;
     }
+    /*Actualiza la fila de la tabla user_settings donde setting_name=affilation
+     correspondiente a un usuario */
     public function updateUniversity($userId, $newUniversity)
     {
         $rowsAffected = $this->update(
@@ -139,6 +164,8 @@ class UsersListTableDAO extends DAO
         );
         return $rowsAffected;
     }
+    /*Actualiza la fila de la tabla user_settings donde setting_name=academicDegree
+     correspondiente a un usuario */
     public function updateAcademicDegree($userId, $newAcademicDegree)
     {
         $rowsAffected = $this->update(
@@ -149,6 +176,8 @@ class UsersListTableDAO extends DAO
         );
         return $rowsAffected;
     }
+        /*Actualiza la fila de la tabla user_settings donde setting_name=biography
+     correspondiente a un usuario */
     public function updateBiography($userId, $biography)
     {
         $rowsAffected = $this->update(
@@ -159,6 +188,8 @@ class UsersListTableDAO extends DAO
         );
         return $rowsAffected;
     }
+    /*Genera una fila en la tabla user_settings donde
+    setting_name=academicDegree y setting_value = valor ingresado*/
     public function insertAcademicDegree($userId, $newAcademicDegree)
     {
         $rowsAffected = $this->update(
@@ -167,6 +198,7 @@ class UsersListTableDAO extends DAO
         );
         return $rowsAffected;
     }
+    //verifica en user_settings si el usuario ya contiene un campo con academicDegree
     public function userHasAcademicDegree($user_id)
     {
         $result = $this->retrieveRange(
@@ -184,7 +216,8 @@ class UsersListTableDAO extends DAO
             return false;
         }
     }
-    public function countFilteredUsers($sql) //se usa para contar el total de usuarios generados por el filtro
+//se usa para contar el total de usuarios generados por el filtro
+    public function countFilteredUsers($sql) 
     {
         $changedSql = str_replace(
             "search.user_id,search.firstName, search.lastName, search.university, search.academicDegree,search.biography, search.username, search.email,search.country, search.roles",
@@ -195,6 +228,7 @@ class UsersListTableDAO extends DAO
         $resultCounted = intval(iterator_to_array($result)[0]->results);
         return $resultCounted;
     }
+//obtiene un usuario por su id
     public function getUserByID($userId)
     {
         $result = $this->retrieveRange(
@@ -224,7 +258,8 @@ class UsersListTableDAO extends DAO
         #$result->Close();
         return $returner;
     }
-
+    /* Obtiene un conteo de los usuarios segun su rol, si no tiene rol
+    trae un conteo de todos los usuarios */
     public function getRolesByCountry($role)
     {
         $sql = "SELECT search.country, COUNT(search.country) as cant

@@ -1,9 +1,18 @@
 <?php
+/*
+ *
+ * Módolo de Gestión para la búsqueda de usuarios
+ * Dylan Mateo Llano Jaramillo & Juan José Restrepo Correa
+ * Politécnico Colombiano Jaime Isaza Cadavid
+ * Medellín-Colombia Mayo de 2023
+ *
+ */
+
 import('lib.pkp.classes.db.DAO');
 
 class AuthorActivityDAO extends DAO{
    
-
+//consulta las publicaciones enviadas por el usuario
 public function publicationSended($email){
 
     $result = $this->retrieveRange(
@@ -18,6 +27,7 @@ public function publicationSended($email){
     $publicationSended = intval(iterator_to_array($result)[0]->publication_sended);
     return $publicationSended;
 }
+//consulta las publicaciones en cola por el usuario
 public function publicationQueued($email){
 
     $result = $this->retrieveRange(
@@ -32,6 +42,7 @@ public function publicationQueued($email){
     $publicationQueued = intval(iterator_to_array($result)[0]->publication_queued);
     return $publicationQueued;
 }
+//consulta las publicaciones aceptadas al usuario
 public function publicationAccepted($email){
 
     $result = $this->retrieveRange(
@@ -46,6 +57,7 @@ public function publicationAccepted($email){
     $publicationAccepted = intval(iterator_to_array($result)[0]->publicationAccepted);
     return $publicationAccepted;
 }
+//consulta las publicaciones rechazadas al usuario
 public function publicationRejected($email){
 
     $result = $this->retrieveRange(
@@ -60,6 +72,7 @@ public function publicationRejected($email){
     $publicationRejected = intval(iterator_to_array($result)[0]->publicationRejected);
     return $publicationRejected;
 }
+//consulta las publicaciones agendadas al usuario
 public function publicationScheduled($email){
 
     $result = $this->retrieveRange(

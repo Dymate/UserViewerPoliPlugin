@@ -1,4 +1,12 @@
 <?php
+/*
+ *
+ * Módolo de Gestión para la búsqueda de usuarios
+ * Dylan Mateo Llano Jaramillo & Juan José Restrepo Correa
+ * Politécnico Colombiano Jaime Isaza Cadavid
+ * Medellín-Colombia Mayo de 2023
+ *
+ */
 require_once(dirname(__FILE__) . '/../../lib/PhpSpreadsheet/vendor/autoload.php');
 import("plugins.generic.userViewerPoliPlugin.controllers.util.UsersListTableHandlerComplements");
 
@@ -11,8 +19,8 @@ class exportUsersReport
     public function exportUsers($usersToExport)
     {   
      
-    
-        $usersToExport = str_replace(['"', "[", "]"], "", $usersToExport);
+        
+        $usersToExport = str_replace(['"', "[", "]"], "", $usersToExport);//limpia la string que viene con formato de arreglo
         $arrayUsersId = explode(",", $usersToExport);
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
         $UserListComplements = new UsersListTableHandlerComplements();

@@ -1,4 +1,12 @@
 <?php
+/*
+ *
+ * Módolo de Gestión para la búsqueda de usuarios
+ * Dylan Mateo Llano Jaramillo & Juan José Restrepo Correa
+ * Politécnico Colombiano Jaime Isaza Cadavid
+ * Medellín-Colombia Mayo de 2023
+ *
+ */
 import("plugins.generic.userViewerPoliPlugin.controllers.UsersListTableHandler");
 import("plugins.generic.userViewerPoliPlugin.controllers.util.UsersListTableHandlerComplements");
 class GenerateUsersTable{
@@ -10,7 +18,9 @@ class GenerateUsersTable{
     }
     public function __construct(){
     }
-
+//este método se encarga de construir la tabla de usuarios
+//a su vez llama n veces al método de construir ventana modal para
+//asignarla a cada usuario 
     public function listUsers($data,$roles)
     {
         $userListComplements=$this->generateUsersListHandlerComplement();
@@ -42,7 +52,9 @@ class GenerateUsersTable{
         }
         return $table;
     }
-    public function generateModalWindow($user, $table)
+    //se encarga de construir las ventanas modales de cada usuario usando el id de cada uno
+    public function generateModalWindow($user, $table) //este método ejecuta la función preg_replace('/<[^>]*>/', '', $user->getBiography())
+                                                      //para limpiar el texto biogrrafía ya que se encontró que varios casos se bugeaba debido a inyeccion HTML
     {   $userListComplements=$this->generateUsersListHandlerComplement();
         $userListHandler=$this->generateUsersListHandler();
         $table .= '
@@ -94,7 +106,7 @@ class GenerateUsersTable{
                     </div>
                     <div class="col-sm-6">' . preg_replace('/<[^>]*>/', '', $user->getBiography()) . '</div>
                 </div>        
-';
+';      //si el usuario tiene rol revisor se añade el acordeón con sus analiticas
         if (strpos($user->getRoles(), "16") !== false) {
            
           list(
@@ -128,6 +140,7 @@ class GenerateUsersTable{
           </div>';
 
         }
+        //si el usuario tiene rol autor se añade el acordeón con sus analiticas
         if (strpos($user->getRoles(), "14") !== false) {
             list($publicationsSended,
             $queuedPublications,
@@ -175,7 +188,7 @@ class GenerateUsersTable{
       <form  method="POST">
       
       <input type="hidden" name="user_id" value="' . $user->getUserId() . '" style="display:none;">
-      <div><b class="data-name">Universidad: </b><input type="text" name="university" value="' . $user->getUniversity() . '"></div>
+      <div><b class="data-name">Universidad: </b><input type="text" name="university" value="' . $user->getUniversity() . '"maxlength="50"></div>
       </div>
 
       <div class="modal-footer">
@@ -198,7 +211,7 @@ class GenerateUsersTable{
       <form  method="POST">
       
       <input type="hidden" name="user_id" value="' . $user->getUserId() . '" style="display:none;">
-      <div><b class="data-name">Grado academico: </b><input  class="form-group" type="text" name="newAcademicDegree" value="' . $user->getAcademicDegree() . '"></div>
+      <div><b class="data-name">Grado academico: </b><input  class="form-group" type="text" name="newAcademicDegree" value="' . $user->getAcademicDegree() . '" maxlength="50"></div>
       </div>
 
       <div class="modal-footer">
@@ -221,7 +234,7 @@ class GenerateUsersTable{
       <form  method="POST">
       
       <input type="hidden" name="user_id" value="' . $user->getUserId() . '" style="display:none;">
-      <div><b class="data-name">Biografía: </b><textarea class="form-group"type="text" style="width: 500px; height:80px;"  name="biography" value="' . preg_replace('/<[^>]*>/', '', $user->getBiography()) . ' ">' .preg_replace('/<[^>]*>/', '', $user->getBiography()) . '</textarea></div>
+      <div><b class="data-name">Biografía: </b><textarea class="form-group"type="text" style="width: 500px; height:80px;"  name="biography" value="' . preg_replace('/<[^>]*>/', '', $user->getBiography()) . ' " maxlength="250">' .preg_replace('/<[^>]*>/', '', $user->getBiography()) . '</textarea></div>
       </div>
 
       <div class="modal-footer">

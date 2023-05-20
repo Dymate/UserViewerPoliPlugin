@@ -1,8 +1,12 @@
 <?php
-
-use PhpOption\None;
-
-use function PHPSTORM_META\type;
+/*
+ *
+ * Módolo de Gestión para la búsqueda de usuarios
+ * Dylan Mateo Llano Jaramillo & Juan José Restrepo Correa
+ * Politécnico Colombiano Jaime Isaza Cadavid
+ * Medellín-Colombia Mayo de 2023
+ *
+ */
 
 import("classes.handler.Handler");
 import("plugins.generic.userViewerPoliPlugin.controllers.util.UsersListTableHandlerComplements");
@@ -32,6 +36,7 @@ class UsersListTableHandler extends Handler
         $plugin = PluginRegistry::getPlugin("generic", "userviewerpoliplugin");
         $templateMgr = TemplateManager::getManager($request);
         $templateMgr->addJavaScript('usersListTable', $plugin->getPluginBaseUrl() . '/js/usersListTable.js');
+        $templateMgr->addStyleSheet('usersListTable', $plugin->getPluginBaseUrl() . '/css/usersListTable.css');
         $templateMgr->assign("userRoles", $roles); //Necesario para el botón usuarios
         $currentPage = isset($_GET["page"]) ? $_GET["page"] : 1;
         $data = $this->getAllUsers($currentPage);
@@ -71,11 +76,10 @@ class UsersListTableHandler extends Handler
         $templateMgr->assign("optionsRoles", $optionsRoles);
         //$selectedUsers=isset($_POST['selectedValues']) ? $_POST['selectedValues'] : null;
 
+        //ejecución de métodos según la petición
         if($needExport != null) {
             $_SESSION['selectedValues']=""; //se reinicia la variable global para evitar bugs en la exportación
             $this->exportUsers($needExport);
-           
-            
         } 
         list($data, $countResult) = $this->generateSearchFilter($name, $lastName, $country, $userRoles, $currentPage);
         if (isset($data)) {
@@ -105,11 +109,12 @@ class UsersListTableHandler extends Handler
             $url = $_SERVER['REQUEST_URI'];
             header("Location: $url");
         }
-
+        //genera la paginación
         $templateMgr->assign("paginationControl", $this->paginationControl($currentPage, $totalPages));
 
         return $templateMgr->display($plugin->getTemplateResource("usersListTable.tpl"));
     }
+    //Genera exportacion de múltiples usuarios
     public function exportMassiveUsers($name, $lastName, $country, $userRoles)
     {
         require_once("util/ExportUsersReport.inc.php");
@@ -118,6 +123,7 @@ class UsersListTableHandler extends Handler
         list($result, $countResult) = $usersListTableDAO->searchUsers($name, $lastName, $country, $userRoles, 1, false);
         $phpExcel->exportAllUsers($result);
     }
+    //genera la consulta del filtro según los parametros entrantes
     public function generateSearchFilter($name, $lastName, $country, $userRoles, $currentPage)
     {
         if (($name or $lastName  or $country or $userRoles) != null) {
@@ -127,6 +133,7 @@ class UsersListTableHandler extends Handler
         }
         return null;
     }
+    //llama la consulta de todos los usuarios
     public function getAllUsers($currentPage)
     {
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
@@ -134,7 +141,7 @@ class UsersListTableHandler extends Handler
 
         return $result;
     }
-
+    //método para controlar la paginación
     public function paginationControl($currentPage, $totalPages)
     {   
         $urlActual = $_SERVER['REQUEST_URI'];
@@ -172,13 +179,13 @@ class UsersListTableHandler extends Handler
 
         return $paginationControl;
     }
-
+    
     public function getTotalPages()
     {
-        //$search = isset($_POST["search"]) ? $_POST["search"] : '';
-
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
-        $totalPages = ceil(($usersListTableDAO->countUsers()) / 10);
+        $totalPages = ceil(($usersListTableDAO->countUsers()) / 10); /*consulta el total de usuarios
+                                                                     divide el numero entre 10 y lo aproxima
+                                                                     con el método ceil                               */
         return $totalPages;
     }
 

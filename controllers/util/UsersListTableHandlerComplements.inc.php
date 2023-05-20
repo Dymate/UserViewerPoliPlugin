@@ -1,5 +1,12 @@
 <?php
-
+/*
+ *
+ * Módolo de Gestión para la búsqueda de usuarios
+ * Dylan Mateo Llano Jaramillo & Juan José Restrepo Correa
+ * Politécnico Colombiano Jaime Isaza Cadavid
+ * Medellín-Colombia Mayo de 2023
+ *
+ */
 class UsersListTableHandlerComplements
 {
     public function __construct()
@@ -7,7 +14,7 @@ class UsersListTableHandlerComplements
     }
 
     public function setRolesAndCountries()
-    {
+    {   //inicializa las variables de los dropdown
         $optionsCountry = array(
             '' => 'Todos',
             'AF' => 'Afganistán',
@@ -94,7 +101,9 @@ class UsersListTableHandlerComplements
             '18' => 'Gestor/a de suscripción'
         );
         return array($optionsCountry, $optionsRoles);
+
     }
+    //convierte los roles numericos de la base de datos en su correspondiente a texto
     public function translateRolesIdToText($roles)
     {
         $arrayRoles = explode(",", $roles);
@@ -165,6 +174,7 @@ class UsersListTableHandlerComplements
         }
         return $convertedRoles;
     }
+    //convierte las abreviaciones de cada país en su nombre completo
     public function completeCountryName($country)
     {
         switch ($country) {
