@@ -1,9 +1,9 @@
 {include file="frontend/components/header.tpl" pageTitleTranslated=$title}
 
 
-<br><br><br>
+
 <!--Vista principal del plugin, muestra la tabla con sus respectivas funciones -->
-<div class="panel panel-default" style="width: fit-content; margin-right: 100px !important;">
+<div class="panel panel-default" style="width: 100%; ">
     <div class="panel-heading project-title">Módulo de gestión para la búsqueda de usuarios</div>
     <form method="POST">
     </form>
@@ -17,22 +17,22 @@
 
                         </th>
                         <form class="form-control" method="GET">
-                            <th>
+                            <th style="width: 100%;">
                                 Nombre
                                 <!--<input type="text" id="name" name="name" onchange="this.form.submit();"
                                     value="{$smarty.post.name}"> -->
-                                <input type="text" id="name" name="name" onchange="sendInputValues('name');"
+                                <input style="width: 120px;" type="text" id="name" name="name" onchange="sendInputValues('name');"
                                     value="{$smarty.get.name}" maxlength="75">
 
                             </th>
                             <th>
                                 Apellido
-                                <input type="text" id="lastnm" name="lastnm" onchange="sendInputValues('lastnm');"
+                                <input style="width: 100px;" type="text" id="lastnm" name="lastnm" onchange="sendInputValues('lastnm');"
                                     value="{$smarty.get.lastnm}" maxlength="50">
                             </th>
-                            <th>
+                            <th style="width: 100%;">
                                 País
-                                <select name="country" id='country' onchange="sendInputValues('country');"
+                                <select style="width: 100%;" name="country" id='country' onchange="sendInputValues('country');"
                                     selected=value="{$smarty.get.country}">
                                     {foreach $optionsCountry as $value => $label}
                                         {if $value == $selectedCountryValue}
@@ -44,7 +44,7 @@
                                 </select>
                             </th>
 
-                            <th>
+                            <th >
                                 Roles
                                 <select name="roles" id='roles' onchange="sendInputValues('roles');"
                                     selected=value="{$smarty.get.roles}">
