@@ -280,11 +280,11 @@ class UsersListTableDAO extends DAO
             GROUP BY u.user_id, u.country, u.username, u.email
         ) AS search
         WHERE 1=1 ";
-        if ($role != null) {
+        if ($role) {
             if ($role == 1) {
                 $sql .= "AND search.roles LIKE '%1,%'";
             } else {
-                $sql .= "AND search.roles LIKE '%" . $role . "%'";
+                $sql .= "AND search.roles =" . $role . " ";
             }
         }
         $sql .= " GROUP BY search.country";
