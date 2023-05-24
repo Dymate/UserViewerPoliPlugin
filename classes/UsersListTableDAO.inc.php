@@ -58,20 +58,22 @@ class UsersListTableDAO extends DAO
             los valores de la columna user_group_id de la tabla uug
              en una única cadena separada por comas (',').*/
             "SELECT u.user_id, 
-                MAX(CASE WHEN us.setting_name = 'givenName' THEN us.setting_value END) AS firstName,
-                MAX(CASE WHEN us.setting_name = 'familyName' THEN us.setting_value END) AS lastName,
-                MAX(CASE WHEN us.setting_name= 'affiliation' THEN us.setting_value END) as university,
-                MAX(CASE WHEN us.setting_name= 'academicDegree' THEN us.setting_value END) as academicDegree,
-                MAX(CASE WHEN us.setting_name= 'biography' THEN us.setting_value END) as biography,
-                u.username,
-                u.email,
-                u.country,
-                GROUP_CONCAT(DISTINCT uug.user_group_id SEPARATOR ',') AS roles
-                FROM users u 
-                LEFT JOIN user_settings us ON u.user_id = us.user_id
-                LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
-                GROUP BY u.user_id
-                limit ?,10;",
+            MAX(CASE WHEN us.setting_name = 'givenName' THEN us.setting_value END) AS firstName,
+            MAX(CASE WHEN us.setting_name = 'familyName' THEN us.setting_value END) AS lastName,
+            MAX(CASE WHEN us.setting_name= 'affiliation' THEN us.setting_value END) as university,
+            MAX(CASE WHEN us.setting_name= 'academicDegree' THEN us.setting_value END) as academicDegree,
+            MAX(CASE WHEN us.setting_name= 'biography' THEN us.setting_value END) as biography,
+            u.username,
+            u.email,
+            u.country,
+            GROUP_CONCAT(DISTINCT uug.user_group_id SEPARATOR ',') AS roles
+            FROM users u 
+            LEFT JOIN user_settings us ON u.user_id = us.user_id
+            LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
+            JOIN user_groups ug ON ug.user_group_id=uug.user_group_id 
+            where ug.context_id=1
+            GROUP BY u.user_id
+            limit ?,10; ",
             array((($page - 1) * 10))
         );
 
@@ -107,8 +109,10 @@ class UsersListTableDAO extends DAO
             FROM users u 
             LEFT JOIN user_settings us ON u.user_id = us.user_id
             LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
+            JOIN user_groups ug ON ug.user_group_id=uug.user_group_id 
+            where ug.context_id=1
             GROUP BY u.user_id) search
-        WHERE 1=1 ";
+            WHERE 1=1 ";
 
         if ($name) {
             $sql .= "AND search.firstName LIKE '%$name%'";
@@ -123,7 +127,7 @@ class UsersListTableDAO extends DAO
             if ($userRoles == 1) {
                 $sql .= "AND search.roles LIKE '%1,%'";
             } else {
-                $sql .= "AND search.roles =" . $userRoles . " ";
+                $sql .= "AND FIND_IN_SET('".$userRoles."', search.roles) ";
             }
         }
         $countResult = $this->countFilteredUsers($sql);
@@ -144,8 +148,11 @@ class UsersListTableDAO extends DAO
     public function countUsers()
     {
         $result = $this->retrieveRange(
-            'SELECT count( u.user_id) as users
-         FROM users u '
+            'SELECT count(distinct u.user_id) as users
+            FROM users u 
+            LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
+           JOIN user_groups ug ON ug.user_group_id=uug.user_group_id 
+           where ug.context_id=1'
         );
         #Se convierte lazyCollection en array, se obtiene el stdObject de la posición 1 y se le extrae el valor y se convierte en entero
 
@@ -176,7 +183,7 @@ class UsersListTableDAO extends DAO
         );
         return $rowsAffected;
     }
-        /*Actualiza la fila de la tabla user_settings donde setting_name=biography
+    /*Actualiza la fila de la tabla user_settings donde setting_name=biography
      correspondiente a un usuario */
     public function updateBiography($userId, $biography)
     {
@@ -216,8 +223,8 @@ class UsersListTableDAO extends DAO
             return false;
         }
     }
-//se usa para contar el total de usuarios generados por el filtro
-    public function countFilteredUsers($sql) 
+    //se usa para contar el total de usuarios generados por el filtro
+    public function countFilteredUsers($sql)
     {
         $changedSql = str_replace(
             "search.user_id,search.firstName, search.lastName, search.university, search.academicDegree,search.biography, search.username, search.email,search.country, search.roles",
@@ -228,7 +235,7 @@ class UsersListTableDAO extends DAO
         $resultCounted = intval(iterator_to_array($result)[0]->results);
         return $resultCounted;
     }
-//obtiene un usuario por su id
+    //obtiene un usuario por su id
     public function getUserByID($userId)
     {
         $result = $this->retrieveRange(
@@ -245,7 +252,8 @@ class UsersListTableDAO extends DAO
                 FROM users u 
                 LEFT JOIN user_settings us ON u.user_id = us.user_id
                 LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
-                WHERE u.user_id=?
+                JOIN user_groups ug ON ug.user_group_id=uug.user_group_id 
+                WHERE u.user_id=? and ug.context_id=1
                 GROUP BY u.user_id
                 ',
             array($userId)
@@ -277,6 +285,8 @@ class UsersListTableDAO extends DAO
             FROM users u 
             LEFT JOIN user_settings us ON u.user_id = us.user_id
             LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
+            JOIN user_groups ug on uug.user_group_id=ug.user_group_id
+            where ug.context_id=1
             GROUP BY u.user_id, u.country, u.username, u.email
         ) AS search
         WHERE 1=1 ";
@@ -284,7 +294,7 @@ class UsersListTableDAO extends DAO
             if ($role == 1) {
                 $sql .= "AND search.roles LIKE '%1,%'";
             } else {
-                $sql .= "AND search.roles =" . $role . " ";
+                $sql .= "AND FIND_IN_SET('".$role."', search.roles) ";;
             }
         }
         $sql .= " GROUP BY search.country";

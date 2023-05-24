@@ -81,7 +81,6 @@ class UsersListTableHandlerComplements
         );
         $optionsRoles = array(
             '' => 'Todos',
-            '1' => 'admin del sitio',
             '2' => 'Gestor/a de revista',
             '3' => 'Editor/a de la revista',
             '4' => 'Coordinador/a de producción',
