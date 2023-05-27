@@ -49,7 +49,7 @@ class UsersListTableDAO extends DAO
     }
     //consulta SQL para traer todos los usuarios en la BD
     //está limitado por la sentencia limit el cual obliga a mostrar 10 registros por página
-    public function getAllUsers($page)
+    public function getAllUsers($page,$contextId)
     {
         $result = $this->retrieveRange(
             //(CASE WHEN) condicional de MySQL
@@ -71,10 +71,10 @@ class UsersListTableDAO extends DAO
             LEFT JOIN user_settings us ON u.user_id = us.user_id
             LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
             JOIN user_groups ug ON ug.user_group_id=uug.user_group_id 
-            where ug.context_id=1
+            where ug.context_id=?
             GROUP BY u.user_id
             limit ?,10; ",
-            array((($page - 1) * 10))
+            array($contextId,(($page - 1) * 10))
         );
 
         $returner = [];
@@ -88,12 +88,13 @@ class UsersListTableDAO extends DAO
     //Este método construye la consulta SQL dependiendo que parámetros le lleguen.
     //$isToFilter variable booleana para saber si el metodo se usará 
     //para filtrar usuarios o exportarlos
-    public function searchUsers($name, $lastName, $country, $userRoles, $page, $isToFilter)
+    public function searchUsers($name, $lastName, $country, $userRoles, $page, $isToFilter, $contextId)
     { //(CASE WHEN) condicional de MySQL
         //Trae el valor despues del THEN si se cumple el CASE WHEN
         /*se utiliza la función GROUP_CONCAT junto con la cláusula DISTINCT para concatenar 
         los valores de la columna user_group_id de la tabla uug
         en una única cadena separada por comas (',').*/
+        
         $sql = "SELECT	search.user_id,search.firstName, search.lastName, search.university, search.academicDegree,search.biography, search.username, search.email,search.country, search.roles
         FROM (  
             SELECT u.user_id,
@@ -110,7 +111,7 @@ class UsersListTableDAO extends DAO
             LEFT JOIN user_settings us ON u.user_id = us.user_id
             LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
             JOIN user_groups ug ON ug.user_group_id=uug.user_group_id 
-            where ug.context_id=1
+            where ug.context_id=".$contextId." 
             GROUP BY u.user_id) search
             WHERE 1=1 ";
 
@@ -130,11 +131,12 @@ class UsersListTableDAO extends DAO
                 $sql .= "AND FIND_IN_SET('".$userRoles."', search.roles) ";
             }
         }
+      
         $countResult = $this->countFilteredUsers($sql);
         if ($isToFilter) {
             $sql .= "limit ?,10";
         }
-
+       
         $result = $this->retrieveRange($sql, array((($page - 1) * 10)));
         $returner = [];
         foreach ($result as $data) {
@@ -145,14 +147,14 @@ class UsersListTableDAO extends DAO
         return array($returner, $countResult);
     }
     //Cuanta los usuarios en la BD para realizar la paginación
-    public function countUsers()
+    public function countUsers($contextId)
     {
         $result = $this->retrieveRange(
             'SELECT count(distinct u.user_id) as users
             FROM users u 
             LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
            JOIN user_groups ug ON ug.user_group_id=uug.user_group_id 
-           where ug.context_id=1'
+           where ug.context_id=? ', array($contextId)
         );
         #Se convierte lazyCollection en array, se obtiene el stdObject de la posición 1 y se le extrae el valor y se convierte en entero
 
@@ -236,7 +238,7 @@ class UsersListTableDAO extends DAO
         return $resultCounted;
     }
     //obtiene un usuario por su id
-    public function getUserByID($userId)
+    public function getUserByID($userId,$contextId)
     {
         $result = $this->retrieveRange(
             'SELECT u.user_id, 
@@ -253,10 +255,10 @@ class UsersListTableDAO extends DAO
                 LEFT JOIN user_settings us ON u.user_id = us.user_id
                 LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
                 JOIN user_groups ug ON ug.user_group_id=uug.user_group_id 
-                WHERE u.user_id=? and ug.context_id=1
+                WHERE u.user_id=? and ug.context_id=?
                 GROUP BY u.user_id
                 ',
-            array($userId)
+            array($userId,$contextId)
         );
 
         $returner = [];
@@ -268,7 +270,7 @@ class UsersListTableDAO extends DAO
     }
     /* Obtiene un conteo de los usuarios segun su rol, si no tiene rol
     trae un conteo de todos los usuarios */
-    public function getRolesByCountry($role)
+    public function getRolesByCountry($role,$contextId)
     {
         $sql = "SELECT search.country, COUNT(search.country) as cant
         FROM (
@@ -286,7 +288,7 @@ class UsersListTableDAO extends DAO
             LEFT JOIN user_settings us ON u.user_id = us.user_id
             LEFT JOIN user_user_groups uug ON u.user_id = uug.user_id
             JOIN user_groups ug on uug.user_group_id=ug.user_group_id
-            where ug.context_id=1
+            where ug.context_id=".$contextId."
             GROUP BY u.user_id, u.country, u.username, u.email
         ) AS search
         WHERE 1=1 ";

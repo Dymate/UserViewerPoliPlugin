@@ -162,7 +162,7 @@ class GenerateUsersTable{
                         <ul class="list-group">
                         <li class="list-group-item">Articulos Enviados: '.$publicationsSended.'</li>
                         <li class="list-group-item "style="background-color: #e9e9f9;">Articulos en espera:  '.$queuedPublications.'</li>
-                        <li class="list-group-item">Articulos Aceptadas: '.$publicationsAcepted.'</li>
+                        <li class="list-group-item">Articulos Aceptados: '.$publicationsAcepted.'</li>
                         <li class="list-group-item "style="background-color: #e9e9f9;">Articulos rechazados: '.$publicationsRejected.'</li>
                         <li class="list-group-item">Articulos programados: '.$scheduledPublications.'</li>
                       </ul>

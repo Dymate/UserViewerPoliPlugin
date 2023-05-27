@@ -31,6 +31,8 @@ class UsersListTableHandler extends Handler
             return print('<h2>Acceso denegado</h2>No tienes permitido ingresar a esta sección.');
         }
         //DECLARACION DE VARIABLES
+        $context = $request->getContext();
+        $contextId = $context ? $context->getId() : CONTEXT_ID_NONE;
         $userListComplements = $this->newUserListComplement();
         $generateUsersTable = $this->newGenerateUsersTable();
         $plugin = PluginRegistry::getPlugin("generic", "userviewerpoliplugin");
@@ -39,12 +41,12 @@ class UsersListTableHandler extends Handler
         $templateMgr->addStyleSheet('usersListTable', $plugin->getPluginBaseUrl() . '/css/usersListTable.css');
         $templateMgr->assign("userRoles", $roles); //Necesario para el botón usuarios
         $currentPage = isset($_GET["page"]) ? $_GET["page"] : 1;
-        $data = $this->getAllUsers($currentPage);
+        $data = $this->getAllUsers($currentPage,$contextId);
         $templateMgr->assign("usersTable", $generateUsersTable->listUsers($data,null));
         $selectedCountryValue = "";
         $selectedRolesValue = "";
         list($optionsCountry, $optionsRoles) = $userListComplements->setRolesAndCountries();
-
+        
         //RECEPCION DE VARIABLES DEL FRONT
         $name = isset($_GET['name']) ? $_GET['name'] : null;
         $lastName = isset($_GET['lastnm']) ? $_GET['lastnm'] : null;
@@ -64,7 +66,7 @@ class UsersListTableHandler extends Handler
         }
         
         if ($exportAll!=null){
-            $this->exportMassiveUsers($name,$lastName,$country,$userRoles);
+            $this->exportMassiveUsers($name,$lastName,$country,$userRoles,$contextId);
             $url = $_SERVER['REQUEST_URI'];
             header("Location: $url");
         }
@@ -79,20 +81,20 @@ class UsersListTableHandler extends Handler
         //ejecución de métodos según la petición
         if($needExport != null) {
             $_SESSION['selectedValues']=""; //se reinicia la variable global para evitar bugs en la exportación
-            $this->exportUsers($needExport);
+            $this->exportUsers($needExport,$contextId,);
         } 
-        list($data, $countResult) = $this->generateSearchFilter($name, $lastName, $country, $userRoles, $currentPage);
+        list($data, $countResult) = $this->generateSearchFilter($name, $lastName, $country, $userRoles, $currentPage,$contextId);
         if (isset($data)) {
             $templateMgr->assign("usersTable", $generateUsersTable->listUsers($data,$userRoles));
             $totalPages = ceil(($countResult) / 10);
             $templateMgr->assign("totalUsers",$countResult);
             
         } else {
-            $totalPages = $this->getTotalPages();
+            $totalPages = $this->getTotalPages($contextId);
             $templateMgr->assign("totalUsers","∼".$totalPages*10);
         }
         
-        $this->generateDataFromChart($userRoles,$templateMgr);
+        $this->generateDataFromChart($userRoles,$templateMgr,$contextId);
     
         if (($university and $user_id) != null) {
             $this->updateUniversity($user_id, $university);
@@ -115,29 +117,30 @@ class UsersListTableHandler extends Handler
         return $templateMgr->display($plugin->getTemplateResource("usersListTable.tpl"));
     }
     //Genera exportacion de múltiples usuarios
-    public function exportMassiveUsers($name, $lastName, $country, $userRoles)
+    public function exportMassiveUsers($name, $lastName, $country, $userRoles,$contextId)
     {
         require_once("util/ExportUsersReport.inc.php");
         $phpExcel = new exportUsersReport();
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
-        list($result, $countResult) = $usersListTableDAO->searchUsers($name, $lastName, $country, $userRoles, 1, false);
+        list($result, $countResult) = $usersListTableDAO->searchUsers($name, $lastName, $country, $userRoles, 1, false, $contextId);
         $phpExcel->exportAllUsers($result);
     }
     //genera la consulta del filtro según los parametros entrantes
-    public function generateSearchFilter($name, $lastName, $country, $userRoles, $currentPage)
-    {
+    public function generateSearchFilter($name, $lastName, $country, $userRoles, $currentPage,$contextId)
+    {   
         if (($name or $lastName  or $country or $userRoles) != null) {
             $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
-            list($result, $countResult) = $usersListTableDAO->searchUsers($name, $lastName, $country, $userRoles, $currentPage, true);
+           
+            list($result, $countResult) = $usersListTableDAO->searchUsers($name, $lastName, $country, $userRoles, $currentPage, true, $contextId);
             return array($result, $countResult);
         }
         return null;
     }
     //llama la consulta de todos los usuarios
-    public function getAllUsers($currentPage)
+    public function getAllUsers($currentPage,$contextId)
     {
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
-        $result = $usersListTableDAO->getAllUsers($currentPage);
+        $result = $usersListTableDAO->getAllUsers($currentPage,$contextId);
 
         return $result;
     }
@@ -180,10 +183,10 @@ class UsersListTableHandler extends Handler
         return $paginationControl;
     }
     
-    public function getTotalPages()
+    public function getTotalPages($contextId)
     {
         $usersListTableDAO = DAORegistry::getDAO("UsersListTableDAO");
-        $totalPages = ceil(($usersListTableDAO->countUsers()) / 10); /*consulta el total de usuarios
+        $totalPages = ceil(($usersListTableDAO->countUsers($contextId)) / 10); /*consulta el total de usuarios
                                                                      divide el numero entre 10 y lo aproxima
                                                                      con el método ceil                               */
         return $totalPages;
@@ -230,15 +233,15 @@ class UsersListTableHandler extends Handler
         $scheduledPublications = $authorActivityDAO->publicationScheduled($email);
         return array($publicationsSended, $queuedPublications, $publicationsAcepted, $publicationsRejected, $scheduledPublications);
     }
-    public function exportUsers($selectedUsers)
+    public function exportUsers($selectedUsers,$contextId)
     {
         require_once("util/ExportUsersReport.inc.php");
         $phpExcel = new exportUsersReport();
-        $phpExcel->exportUsers($selectedUsers);
+        $phpExcel->exportUsers($selectedUsers,$contextId);
     }
-    public function generateDataFromChart($role,$templateMgr){
+    public function generateDataFromChart($role,$templateMgr,$contextId){
         $usersListTableDAO=DAORegistry::getDAO("UsersListTableDAO");
-        list($labels,$data)=$usersListTableDAO->getRolesByCountry($role);
+        list($labels,$data)=$usersListTableDAO->getRolesByCountry($role,$contextId);
         $jsonLabels=json_encode($labels);
         $jsonData=json_encode($data);
         

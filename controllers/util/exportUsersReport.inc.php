@@ -16,7 +16,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class exportUsersReport
 {
 
-    public function exportUsers($usersToExport)
+    public function exportUsers($usersToExport,$contextId)
     {   
      
         
@@ -45,7 +45,7 @@ class exportUsersReport
         $index = 2;
         // Obtener datos de la base de datos y agregarlos a la hoja de cálculo
         foreach ($arrayUsersId as $userId) {
-            $user = $usersListTableDAO->getUserById($userId);
+            $user = $usersListTableDAO->getUserById($userId,$contextId,);
             if ($user !== null) {
             $sheet->setCellValue('A' . $index, $user->getUserId());
             $sheet->setCellValue('B' . $index, $user->getFirstName());
